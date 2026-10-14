@@ -13,8 +13,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# Fichiers applicatifs dans l'image (secours si le bind mount Windows est vide)
+COPY index.php /var/www/html/index.php
+COPY config/ /var/www/html/config/
 
-ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]
