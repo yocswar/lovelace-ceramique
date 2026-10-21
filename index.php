@@ -2,34 +2,40 @@
 
 declare(strict_types=1);
 
-header('Content-Type: text/html; charset=utf-8');
+// Charge les contrôleurs (pas d'autoload pour le moment).
+require __DIR__ . '/backend/controllers/HomeController.php';
+require __DIR__ . '/backend/controllers/TestController.php';
+require __DIR__ . '/backend/controllers/ExampleController.php';
 
-echo '<h1>Lovelace Céramique — test PHP</h1>';
-echo '<p>Version PHP : ' . PHP_VERSION . '</p>';
+// Chemin demandé par le navigateur, ex. "/" ou "/test" (sans ?paramètres).
+$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+$path = is_string($uri) ? $uri : '/';
 
-/** @var PDO $pdo */
-$pdo = require __DIR__ . '/config/db.php';
-$pdo->query('SELECT 1');
+// Selon le chemin, on appelle le bon contrôleur.
+switch ($path) {
+    case '/':
+        // Page d'accueil → HomeController::index()
+        $controller = new HomeController();
+        $controller->index();
+        break;
 
-class Exemple {
-    public string $message;
+    case '/test':
+        // Page de test → TestController::index()
+        $controller = new TestController();
+        $controller->index();
+        break;
 
-    public function __construct(string $message){
-        $this->message = $message;
-    }
+    case '/example':
+        // Page d'exemple → ExampleController::index()
+        $controller = new ExampleController();
+        $controller->index();
+        break;
 
-    public function afficher(): void {
-        echo '<p style="color: blue;">' . $this->message . '</p>';
-    }
-
-    public function goodBye(): void {
-        echo '<p style="color: red;">Au revoir, monde !</p>';
-    }
+    default:
+        // Aucun case ne correspond → page introuvable
+        http_response_code(404);
+        echo '404 — page introuvable';
+        break;
 }
 
-$exemple = new Exemple('Bonjour, monde !');
-$exemple->afficher(); // Affiche "Bonjour, monde !"
-$exemple->goodBye(); // Affiche "Au revoir, monde !"
 
-echo '<p style="color: green;">Connexion PostgreSQL OK</p>';
-echo __DIR__;
