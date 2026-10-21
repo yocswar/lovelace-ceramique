@@ -11,7 +11,7 @@ final class HomeController
     {
         header('Content-Type: text/html; charset=utf-8');
 
-        echo '<h1>Lovelace Céramique — test PHP</h1>';
+        echo '<h1>Lovelace Céramique — home PHP</h1>';
         echo '<p>Version PHP : ' . PHP_VERSION . '</p>';
 
         /** @var PDO $pdo */
