@@ -1,8 +1,6 @@
-# Lovelace Céramique
+# PotterPilot
 
 Application web SaaS destinée aux artisans potiers et céramistes — projet collectif Ada Tech School (CDA).
-
-> **Nom de l'application à confirmer :** PotterPilot, ClayFlow, PotterFlow, PlanPot ou ZenPot. « Lovelace Céramique » désigne actuellement le projet.
 
 ## 1. Contexte et objectifs
 
@@ -24,8 +22,8 @@ Chaque matin, Claire, céramiste et fondatrice d'un atelier, perd du temps à re
 ## 2. Profils et droits envisagés
 
 | Profil | Responsabilités prévues |
+| --- | --- |
 | **Admin** | Créer, supprimer et configurer les étapes, définir les échéances, déplacer les objets entre étapes, ajouter des membres et attribuer des rôles ; dispose également des droits de contribution. |
-| **Manager** | Créer des commandes, les attribuer, valider les tâches et suivre les objets dans les étapes de production. |
 | **Contributeur** | Créer et attribuer des tâches, les valider et faire progresser les objets dans le workflow, selon les droits retenus. |
 
 > La répartition exacte des permissions devra être précisée avant l'implémentation de l'authentification et de l'autorisation.
@@ -88,7 +86,7 @@ PHP-FPM 8.5
 PostgreSQL 17
 ```
 
-Le frontend React fonctionne **hors Docker** pendant le développement. Docker exécute Nginx, PHP, PostgreSQL et pgAdmin. Le proxy de `frontend/vite.config.js` redirige les requêtes `/api` vers Nginx ; les composants peuvent donc appeler `fetch('/api/healthcheck')` sans URL absolue.
+Le frontend React fonctionne **dans Docker** en mode développement via le service `frontend` (Node.js et Vite). Le proxy de `frontend/vite.config.js` redirige les requêtes `/api` vers `http://nginx:80` sur le réseau Docker ; les composants peuvent donc appeler `fetch('/api/healthcheck')` sans URL absolue.
 
 ## 5. Installation et démarrage
 
@@ -96,7 +94,7 @@ Le frontend React fonctionne **hors Docker** pendant le développement. Docker e
 
 - Git.
 - Docker Desktop et Docker Compose (ou une installation Docker équivalente).
-- Node.js et npm compatibles avec la version de Vite du projet.
+- Node.js et npm sont fournis par le conteneur `frontend` ; installation locale facultative.
 - Un éditeur de code, par exemple Visual Studio Code.
 
 **Windows + WSL 2 :** démarrer Docker Desktop et activer l'intégration de la distribution dans **Settings → Resources → WSL Integration**. Exécuter les commandes depuis le même environnement de travail.
@@ -108,7 +106,7 @@ git clone https://github.com/yocswar/lovelace-ceramique.git lovelace-ceramique
 cd lovelace-ceramique
 ```
 
-> Tant que la pull request d'architecture n'est pas fusionnée, les instructions React/PHP ci-dessous correspondent à la branche `chore/project-architecture`, et pas nécessairement à `main`.
+> Vérifier la branche utilisée et son état avant de commencer : `git status` et `git branch --show-current`.
 
 ### Étape 2 — Configurer l'environnement
 
@@ -146,19 +144,18 @@ curl -i http://localhost:8080/api/healthcheck
 
 Une réponse `HTTP 200 OK` avec `"status":"ok"` confirme que PHP a pu exécuter `SELECT 1` dans PostgreSQL. **La racine `http://localhost:8080/` n'est plus la page HTML de test initiale.**
 
-### Étape 5 — Installer et démarrer React
+### Étape 5 — Démarrer React
 
-Dans un **deuxième terminal**, depuis la racine du dépôt :
+Le service `frontend` est déjà démarré par `docker compose up -d --build`. Il exécute automatiquement `npm ci` puis Vite. Depuis la racine du dépôt, vérifier son état :
 
 ```bash
-cd frontend
-npm ci
-npm run dev
+docker compose ps
+docker compose logs --tail=30 frontend
 ```
 
 Ouvrir http://localhost:5173, puis cliquer sur **« Vérifier la connexion »**. Le message attendu est **« Connexion PostgreSQL OK »**.
 
-`npm ci` utilise le fichier `package-lock.json` ; le répertoire `node_modules/` est ignoré par Git.
+`npm ci` utilise le fichier `package-lock.json` ; les dépendances sont conservées dans le volume Docker `frontend_node_modules`. Le répertoire `node_modules/` est ignoré par Git.
 
 ### Étape 6 — Accéder à pgAdmin
 
@@ -166,50 +163,49 @@ Ouvrir http://localhost:5050.
 
 Identifiants de développement par défaut (à vérifier dans `.env`) :
 
-- **Email :** `ada@example.com`
-- **Mot de passe :** `ada_dev`
+- **Email :** valeur de `PGADMIN_EMAIL` dans `.env`
+- **Mot de passe :** valeur de `PGADMIN_PASSWORD` dans `.env`
 
 Dans **Register → Server**, renseigner :
 
-| Champ                | Valeur de développement |
-| -------------------- | ----------------------- |
-| Name                 | Lovelace                |
-| Host name/address    | `postgres`              |
-| Port                 | `5432`                  |
-| Maintenance database | `lovelace`              |
-| Username             | `lovelace`              |
-| Password             | `lovelace_dev`          |
+| Champ                | Valeur de développement                   |
+| -------------------- | ----------------------------------------- |
+| Name                 | PotterPilot                               |
+| Host name/address    | `postgres`                                |
+| Port                 | `5432`                                    |
+| Maintenance database | `lovelace`                                |
+| Username             | `lovelace`                                |
+| Password             | Valeur de `POSTGRES_PASSWORD` dans `.env` |
 
 **Important :** dans pgAdmin exécuté sous Docker, l'hôte est **`postgres`**, et non `localhost`. Les identifiants de PostgreSQL doivent correspondre aux valeurs effectives de `.env` et de la base initialisée.
 
 ### Étape 7 — Vérifications frontend
 
-Depuis `frontend/` :
+Depuis la racine du dépôt :
 
 ```bash
-npm run lint
-npm run build
+docker compose exec frontend npm run lint
+docker compose exec frontend npm run build
 ```
 
 Le build crée `frontend/dist/` (ignoré par Git). Il **ne déploie pas** l'application : le serveur Nginx actuel expose l'API, tandis que Vite sert l'interface en développement.
 
 ### Arrêter et redémarrer
 
-- **Frontend :** `Ctrl + C` dans le terminal Vite.
-- **Services Docker :** depuis la racine du dépôt, `docker compose down`.
-- **Redémarrage :** `docker compose up -d`, puis `npm run dev` depuis `frontend/`.
+- **Tous les services (y compris React) :** depuis la racine du dépôt, `docker compose down`.
+- **Redémarrage :** `docker compose up -d`.
 
 Ne pas utiliser `docker compose down -v` pour un arrêt normal : l'option `-v` supprime les volumes Docker et peut entraîner une perte de données PostgreSQL.
 
 ### Dépannage rapide
 
-| Problème                       | Vérification                                                         |
-| ------------------------------ | -------------------------------------------------------------------- |
-| Docker introuvable dans WSL    | Docker Desktop démarré et intégration WSL activée                    |
-| Frontend indisponible          | `node -v`, `npm -v`, puis `npm ci` et `npm run dev` dans `frontend/` |
-| Erreur de connexion dans React | Tester successivement les deux URL de healthcheck ci-dessous         |
-| PostgreSQL indisponible        | `docker compose ps` et `docker compose logs postgres`                |
-| Erreur PHP / Nginx             | `docker compose logs php` et `docker compose logs nginx`             |
+| Problème                       | Vérification                                                 |
+| ------------------------------ | ------------------------------------------------------------ |
+| Docker introuvable dans WSL    | Docker Desktop démarré et intégration WSL activée            |
+| Frontend indisponible          | `docker compose ps` puis `docker compose logs frontend`      |
+| Erreur de connexion dans React | Tester successivement les deux URL de healthcheck ci-dessous |
+| PostgreSQL indisponible        | `docker compose ps` et `docker compose logs postgres`        |
+| Erreur PHP / Nginx             | `docker compose logs php` et `docker compose logs nginx`     |
 
 ```bash
 curl -i http://localhost:8080/api/healthcheck
@@ -243,7 +239,7 @@ En cas d'échec du service, l'API renvoie une erreur HTTP `503`. Une route incon
 ## 7. Contribution et conventions Git
 
 - Partir d'un `main` à jour : `git switch main && git pull`.
-- Créer une branche dédiée : `git switch -c feature/ma-feature`.
+- Créer une branche dédiée : `git switch -c feat/ma-feature` (ou suivre la convention validée par l’équipe).
 - Une branche par fonctionnalité ou correction.
 - Ouvrir une **pull request** avant toute fusion vers `main` ; **au moins une approbation** est requise.
 - Utiliser [Conventional Commits](https://www.conventionalcommits.org/) : `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`.
@@ -252,13 +248,13 @@ En cas d'échec du service, l'API renvoie une erreur HTTP `503`. Une route incon
 
 | Préfixe     | Usage                              | Exemple                         |
 | ----------- | ---------------------------------- | ------------------------------- |
-| `feature/`  | Nouvelle fonctionnalité            | `feature/catalogue-pieces`      |
+| `feat/`     | Nouvelle fonctionnalité            | `feat/catalogue-pieces`         |
 | `fix/`      | Correction de bug                  | `fix/validation-email`          |
 | `docs/`     | Documentation                      | `docs/readme-installation`      |
 | `refactor/` | Restructuration du code            | `refactor/separation-services`  |
 | `chore/`    | Configuration, dépendances, outils | `chore/mise-a-jour-dependances` |
 
-Exemples : « Afficher le catalogue des pièces » → `feature/catalogue-pieces` ; « Corriger la connexion API » → `fix/connexion-postgres` ; « Documenter le choix PostgreSQL » → `docs/adr-choix-bdd`.
+Exemples : « Afficher le catalogue des pièces » → `feat/catalogue-pieces` ; « Corriger la connexion API » → `fix/connexion-postgres` ; « Documenter le choix PostgreSQL » → `docs/adr-choix-bdd`.
 
 ## 8. Outils et organisation du travail
 
