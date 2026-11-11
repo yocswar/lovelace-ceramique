@@ -15,9 +15,9 @@ final class TicketModel
     // Les pièces des commandes encore actives (à faire ou en cours) : les cartes du Kanban (US.14).
     // LEFT JOIN sur utilisateur : une pièce peut ne pas encore être assignée (utilisateur_id NULL),
     // avec un JOIN simple elle disparaîtrait du tableau.
-    public function findActifs(): array
+    public function findActifsFromCommand(int $commandeId): array
     {
-        return $this->pdo->query(
+        $stmt = $this->pdo->prepare(
             "SELECT ct.id, ct.commande_id, c.nom_client, c.statut,
                     p.nom AS piece, ct.etape_id, u.nom AS artisan
              FROM commande_ticket ct
@@ -25,9 +25,11 @@ final class TicketModel
              JOIN piece p ON p.id = ct.piece_id
              JOIN etape e ON e.id = ct.etape_id
              LEFT JOIN utilisateur u ON u.id = ct.utilisateur_id
-             WHERE c.statut IN ('a_faire', 'en_cours')
+             WHERE c.statut IN ('a_faire', 'en_cours') AND c.id = :commande_id
              ORDER BY e.ordre, c.id, ct.id"
-        )->fetchAll();
+        );
+        $stmt->execute(['commande_id' => $commandeId]);
+        return $stmt->fetchAll();
     }
 
     // Un ticket avec l'ordre de son étape actuelle (sert à trouver l'étape suivante).

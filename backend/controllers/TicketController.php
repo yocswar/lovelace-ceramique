@@ -25,9 +25,10 @@ final class TicketController
     // US.14 : les étapes (colonnes) + les pièces des commandes actives (cartes)
     public function index(): void
     {
-        // GET = lire : on refuse les autres méthodes
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            $this->view->error(405, 'Méthode non autorisée');
+        $id = (int) ($_GET['id'] ?? 0);
+
+        if ($id == 0) {
+            $this->view->error(400, 'ID de commande nulle ou invalide');
             return;
         }
 
@@ -36,7 +37,7 @@ final class TicketController
             $pdo = require __DIR__ . '/../config/db.php';
 
             $etapes = (new EtapeModel($pdo))->findAll();
-            $tickets = (new TicketModel($pdo))->findActifs();
+            $tickets = (new TicketModel($pdo))->findActifsFromCommand($id);
 
             $this->view->kanban($etapes, $tickets);
         } catch (Throwable $e) {
@@ -46,13 +47,10 @@ final class TicketController
     }
 
     // US.12 : passe le ticket $id à l'étape suivante
-    public function etapeSuivante(int $id): void
+    public function etapeSuivante(): void
     {
-        // PATCH = modifier une partie d'une donnée existante (ici : seulement l'étape du ticket)
-        if ($_SERVER['REQUEST_METHOD'] !== 'PATCH') {
-            $this->view->error(405, 'Méthode non autorisée');
-            return;
-        }
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = (int) ($data['id'] ?? 0);
 
         try {
             /** @var PDO $pdo */

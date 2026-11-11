@@ -17,15 +17,6 @@ use App\Controllers\TicketController;
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Route avec un id dans l'URL (US.12) : un switch ne compare que des textes exacts,
-// donc on la reconnaît avec une expression régulière (preg_match) avant le switch.
-// (\d+) capture le numéro du ticket, par exemple 12 dans /api/tickets/12/etape-suivante
-if (preg_match('#^/api/tickets/(\d+)/etape-suivante$#', $path, $matches)) {
-    $controller = new TicketController();
-    $controller->etapeSuivante((int) $matches[1]);
-    exit;
-}
-
 // Routes des contrôleurs
 switch ($path) {
     case '/':
@@ -56,8 +47,23 @@ switch ($path) {
     // US.14 : étapes + pièces des commandes actives, pour le Kanban de la page d'accueil
     case '/api/tickets':
         $controller = new TicketController();
-        $controller->index();
+        switch ($method) {
+            case 'GET':
+                $controller->index();
+                break;
+            case 'PATCH':
+                $controller->etapeSuivante();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Méthode non autorisée'
+                ]);
+                break;
+        }
         break;
+
     case '/api/utilisateurs':
         $controller = new UtilisateurController();
         switch ($method) {

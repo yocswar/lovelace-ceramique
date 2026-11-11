@@ -124,7 +124,7 @@ function Accueil() {
           </div>
         )}
       </section>
-      <Kanban/>
+      <Kanban commandeId={17} />
       <InscriptionForm/>
     </main>
   );

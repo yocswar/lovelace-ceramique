@@ -3,7 +3,7 @@ import "./Kanban.css";
 
 // Page d'accueil (US.14) : une colonne par étape de l'atelier, une carte par pièce à fabriquer.
 // Sur chaque carte, un bouton (US.12) passe la pièce à l'étape suivante.
-function Kanban() {
+function Kanban({commandeId}) {
   const [etapes, setEtapes] = useState([]); // les colonnes, dans l'ordre de l'atelier
   const [tickets, setTickets] = useState([]); // les cartes (une pièce = un ticket)
   const [loading, setLoading] = useState(true); // true tant que la première réponse n'est pas arrivée
@@ -15,7 +15,7 @@ function Kanban() {
   useEffect(() => {
     async function chargerKanban() {
       try {
-        const response = await fetch("/api/tickets"); // GET par défaut : on lit
+        const response = await fetch("/api/tickets?id=" + commandeId); // GET par défaut : on lit
         const data = await response.json();
 
         if (!response.ok) {
@@ -42,8 +42,12 @@ function Kanban() {
 
     try {
       // PATCH = modifier une partie d'une donnée existante (seulement l'étape du ticket)
-      const response = await fetch(`/api/tickets/${ticketId}/etape-suivante`, {
+      const response = await fetch(`/api/tickets`, {
         method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id: ticketId })
       });
       const data = await response.json();
 
