@@ -1,6 +1,7 @@
 import { useState } from "react";
 import InscriptionForm from "../InscriptionForm/InscriptionForm";
 import FormulaireConnexion from "../FormulaireConnexion/FormulaireConnexion";
+import Kanban from "../Kanban/Kanban";
 
 function Accueil() {
   const [message, setMessage] = useState("");
@@ -123,6 +124,7 @@ function Accueil() {
           </div>
         )}
       </section>
+      <Kanban commandeId={17} />
       <InscriptionForm/>
     </main>
   );
