@@ -3,6 +3,8 @@
 
 declare(strict_types=1);
 
+namespace App\Views;
+
 final class TicketView
 {
     // US.14 : les colonnes (étapes) et les cartes (tickets) en une seule réponse

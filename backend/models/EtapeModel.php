@@ -4,6 +4,10 @@
 
 declare(strict_types=1);
 
+namespace App\Models;
+
+use PDO;
+
 final class EtapeModel
 {
     // La connexion est donnée par le contrôleur (injection de dépendance) :

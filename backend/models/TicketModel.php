@@ -4,6 +4,10 @@
 
 declare(strict_types=1);
 
+namespace App\Models;
+
+use PDO;
+
 final class TicketModel
 {
     public function __construct(private PDO $pdo) {}

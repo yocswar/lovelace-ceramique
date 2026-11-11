@@ -11,6 +11,7 @@ use App\Controllers\ExampleController;
 use App\Controllers\UtilisateurController;
 use App\Controllers\HealthcheckController;
 use App\Controllers\AuthController;
+use App\Controllers\TicketController;
 
 // Récupérer la route demandée
 $method = $_SERVER['REQUEST_METHOD'];

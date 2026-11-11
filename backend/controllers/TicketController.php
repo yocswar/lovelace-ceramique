@@ -5,9 +5,13 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../models/TicketModel.php';
-require_once __DIR__ . '/../models/EtapeModel.php';
-require_once __DIR__ . '/../views/TicketView.php';
+namespace App\Controllers;
+
+use App\Models\EtapeModel;
+use App\Models\TicketModel;
+use App\Views\TicketView;
+use PDO;
+use Throwable;
 
 final class TicketController
 {
