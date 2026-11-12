@@ -1,6 +1,7 @@
 #
 name: security
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 12 * * *" # cron posix : tous les jours a 12h UTC (minute heure jour mois jourdelasemaine 0à6 dim à sam)
 jobs:
