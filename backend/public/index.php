@@ -11,6 +11,7 @@ use App\Controllers\ExampleController;
 use App\Controllers\UtilisateurController;
 use App\Controllers\HealthcheckController;
 use App\Controllers\AuthController;
+use App\Controllers\TicketController;
 
 // Récupérer la route demandée
 $method = $_SERVER['REQUEST_METHOD'];
@@ -41,6 +42,26 @@ switch ($path) {
     case '/api/healthcheck':
         $controller = new HealthcheckController();
         $controller->index();
+        break;
+
+    // US.14 : étapes + pièces des commandes actives, pour le Kanban de la page d'accueil
+    case '/api/tickets':
+        $controller = new TicketController();
+        switch ($method) {
+            case 'GET':
+                $controller->index();
+                break;
+            case 'PATCH':
+                $controller->etapeSuivante();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Méthode non autorisée'
+                ]);
+                break;
+        }
         break;
 
     case '/api/utilisateurs':

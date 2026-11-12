@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
 use App\Models\HealthcheckModel;
 use App\Views\HealthcheckView;
 use Throwable;
