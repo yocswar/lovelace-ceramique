@@ -6,5 +6,7 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-      - run: npm CI
+      - name: builder image docker
+        run: docker compose build
+      - name: lancer test
+        run: docker compose run --rm php sh -c "composer dump-autoload && vendor/bin/phpunit"
