@@ -1,5 +1,6 @@
 name: security
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 12 * * *" # Tous les jours à midi. Dans l'ordre : minute (0-59) -heure (0-23) -jour du mois (1-31) -mois (1-12) -jour de la semaine (0-6 (dimanche=0))
 jobs:
