@@ -3,12 +3,12 @@ name: security
 on:
   schedule:
     - cron: "0 12 * * *" # cron posix : tous les jours a 12h UTC (minute heure jour mois jourdelasemaine 0à6 dim à sam)
-  jobs:
-    node-audit:
-      name: audit dependances node
-      runs-on: ubuntu-26.04
-      steps:
-        - uses: actions/checkout@v7
-        - uses: actions/setup-node@v7
-        - name: audit dependances de node
-          run: npm audit
+jobs:
+  node-audit:
+    name: audit dependances node
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+      - name: audit dependances de node
+        run: npm audit
