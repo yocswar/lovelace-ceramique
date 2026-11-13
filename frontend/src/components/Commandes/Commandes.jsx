@@ -4,7 +4,7 @@ import "./Commandes.css";
 
 //Affichage des commandes qui contient un kanban par commande avec ses tickets propres
 function Commandes() {
-    const [commandes, setCommandes] = useState([{ id: 17 }]);
+    const [commandes, setCommandes] = useState([{ id: 17 }, { id: 18 }, { id: 19 }]);
     // const [chargement, setChargement] = useState(true);
     const [message, setMessage] = useState("");
 
