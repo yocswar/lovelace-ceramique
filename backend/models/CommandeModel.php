@@ -1,5 +1,5 @@
 <?php
-// Modèle des commandes (tables commande + commande_ticket + lecture de piece et etape).
+// Modèle des commandes (tables commande + commande_ticket, et lecture de etape).
 // Toutes les requêtes SQL de la création de commande sont ici, jamais dans le contrôleur.
 
 declare(strict_types=1);
@@ -12,27 +12,6 @@ use Throwable;
 final class CommandeModel
 {
     public function __construct(private PDO $pdo) {}
-
-    // Le catalogue de pièces, pour remplir la liste déroulante du formulaire React
-    public function toutesLesPieces(): array
-    {
-        return $this->pdo->query('SELECT id, nom FROM piece ORDER BY nom')->fetchAll();
-    }
-
-    // Vrai si TOUS les ids donnés existent dans piece (évite une erreur de clé étrangère brute)
-    public function piecesExistent(array $ids): bool
-    {
-        $ids = array_values(array_unique($ids));
-        if ($ids === []) {
-            return false;
-        }
-
-        $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM piece WHERE id IN ($placeholders)");
-        $stmt->execute($ids);
-
-        return (int) $stmt->fetchColumn() === count($ids);
-    }
 
     // La première étape du circuit (ordre le plus petit) : c'est là que démarre chaque nouveau ticket.
     // Renvoie null si la table etape est vide.

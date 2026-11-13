@@ -1,6 +1,5 @@
 <?php
 // Contrôleur des commandes : reçoit la requête, vérifie le token et les données, demande au modèle, répond via la vue.
-// GET  /api/pieces     → la liste des pièces pour le formulaire
 // POST /api/commandes  → crée une commande et ses tickets
 //
 // Corps attendu du POST :
@@ -11,9 +10,9 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Models\CommandeModel;
+use App\Models\PieceModel;
+use App\Services\JwtAuth;
 use App\Views\CommandeView;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use PDO;
 use Throwable;
 
@@ -28,24 +27,6 @@ final class CommandeController
         $this->view = new CommandeView();
     }
 
-    // GET /api/pieces
-    public function pieces(): void
-    {
-        if ($this->utilisateurConnecte() === null) {
-            $this->view->error(401, 'Authentification requise');
-            return;
-        }
-
-        try {
-            /** @var PDO $pdo */
-            $pdo = require __DIR__ . '/../config/db.php';
-            $this->view->pieces((new CommandeModel($pdo))->toutesLesPieces());
-        } catch (Throwable $e) {
-            error_log($e->getMessage());
-            $this->view->error(500, 'Impossible de charger les pièces');
-        }
-    }
-
     // POST /api/commandes
     public function creer(): void
     {
@@ -54,7 +35,7 @@ final class CommandeController
             return;
         }
 
-        $utilisateur = $this->utilisateurConnecte();
+        $utilisateur = JwtAuth::utilisateurConnecte();
         if ($utilisateur === null) {
             $this->view->error(401, 'Authentification requise');
             return;
@@ -93,47 +74,27 @@ final class CommandeController
         try {
             /** @var PDO $pdo */
             $pdo = require __DIR__ . '/../config/db.php';
-            $model = new CommandeModel($pdo);
 
-            if (!$model->piecesExistent(array_column($lignes, 'piece_id'))) {
+            if (!(new PieceModel($pdo))->tousExistent(array_column($lignes, 'piece_id'))) {
                 $this->view->error(422, 'Une des pièces demandées n\'existe pas');
                 return;
             }
 
-            $etapeId = $model->premiereEtapeId();
+            $commandeModel = new CommandeModel($pdo);
+
+            $etapeId = $commandeModel->premiereEtapeId();
             if ($etapeId === null) {
                 error_log('Création de commande impossible : la table etape est vide');
                 $this->view->error(500, 'Configuration des étapes manquante');
                 return;
             }
 
-            $resultat = $model->creerAvecTickets($nomClient, (int) $utilisateur['sub'], $lignes, $etapeId);
+            $resultat = $commandeModel->creerAvecTickets($nomClient, (int) $utilisateur['sub'], $lignes, $etapeId);
 
             $this->view->creee($resultat['commande_id'], $resultat['nb_tickets']);
         } catch (Throwable $e) {
             error_log($e->getMessage());
             $this->view->error(500, 'Impossible de créer la commande');
-        }
-    }
-
-    // Lit le header « Authorization: Bearer <token> » et décode le JWT émis par AuthController.
-    // Renvoie les claims (sub, identifiant, role…) ou null si le token est absent, invalide ou expiré.
-    private function utilisateurConnecte(): ?array
-    {
-        $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
-        if (!preg_match('/^Bearer\s+(.+)$/i', $header, $m)) {
-            return null;
-        }
-
-        $secret = getenv('JWT_SECRET');
-        if ($secret === false || $secret === '') {
-            return null;
-        }
-
-        try {
-            return (array) JWT::decode($m[1], new Key($secret, 'HS256'));
-        } catch (Throwable $e) {
-            return null;
         }
     }
 }

@@ -13,6 +13,7 @@ use App\Controllers\HealthcheckController;
 use App\Controllers\AuthController;
 use App\Controllers\TicketController;
 use App\Controllers\CommandeController;
+use App\Controllers\PieceController;
 
 // Récupérer la route demandée
 $method = $_SERVER['REQUEST_METHOD'];
@@ -67,10 +68,10 @@ switch ($path) {
 
     // Création de commande : le catalogue de pièces alimente la liste déroulante du formulaire
     case '/api/pieces':
-        $controller = new CommandeController();
+        $controller = new PieceController();
         switch ($method) {
             case 'GET':
-                $controller->pieces();
+                $controller->index();
                 break;
             default:
                 http_response_code(405);

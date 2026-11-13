@@ -9,7 +9,7 @@ function Accueil() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-  const [utilisateurs, setUtilisateurs] = useState([]);
+  const [utilisateur, setUtilisateur] = useState([]);
 
   async function verifierConnexion() {
     setLoading(true);
@@ -44,7 +44,7 @@ function Accueil() {
     }
   }
 
-  async function getUtilisateurs() {
+  async function getUtilisateur() {
     setLoading(true);
     setMessage("");
     setStatus("");
@@ -66,7 +66,7 @@ function Accueil() {
       if (data.status === "ok" && data.database === "connected") {
         setMessage(data.message);
         setStatus("success");
-        setUtilisateurs(data.result);
+        setUtilisateur(data.result);
       } else {
         throw new Error("La base de données est indisponible");
       }
@@ -107,7 +107,7 @@ function Accueil() {
           </p>
         )}
 
-        <button type="button" onClick={getUtilisateurs} disabled={loading}>
+        <button type="button" onClick={getUtilisateur} disabled={loading}>
           {loading ? "Récupération..." : "Récupérer les utilisateurs"}
         </button>
 
@@ -117,11 +117,11 @@ function Accueil() {
           </p>
         )}
 
-        {utilisateurs.length > 0 && (
+        {utilisateur.length > 0 && (
           <div>
             <h3>Liste des utilisateurs :</h3>
             <ul>
-              {utilisateurs.map((utilisateur) => (
+              {utilisateur.map((utilisateur) => (
                 <li key={utilisateur.id}>
                   {utilisateur.nom} - {utilisateur.email}
                 </li>
@@ -130,7 +130,7 @@ function Accueil() {
           </div>
         )}
       </section>
-      <Kanban commandeId={17} />
+      <Kanban commandeId={32} />
       <InscriptionForm/>
     </main>
   );

@@ -7,12 +7,6 @@ namespace App\Views;
 
 final class CommandeView
 {
-    // La liste des pièces du catalogue, pour le formulaire
-    public function pieces(array $pieces): void
-    {
-        $this->send(200, ['status' => 'ok', 'pieces' => $pieces]);
-    }
-
     // 201 = « créé » : la commande et ses tickets existent maintenant en base
     public function creee(int $commandeId, int $nbTickets): void
     {
