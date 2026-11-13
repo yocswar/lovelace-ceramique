@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import InscriptionForm from "../InscriptionForm/InscriptionForm";
 import FormulaireConnexion from "../FormulaireConnexion/FormulaireConnexion";
 import Kanban from "../Kanban/Kanban";
+import Commandes from "../Commandes/Commandes";
 
 function Accueil() {
   const navigate = useNavigate();
@@ -130,7 +131,7 @@ function Accueil() {
           </div>
         )}
       </section>
-      <Kanban commandeId={32} />
+      <Commandes/>
       <InscriptionForm/>
     </main>
   );
