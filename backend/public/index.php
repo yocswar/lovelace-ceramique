@@ -12,6 +12,8 @@ use App\Controllers\UtilisateurController;
 use App\Controllers\HealthcheckController;
 use App\Controllers\AuthController;
 use App\Controllers\TicketController;
+use App\Controllers\CommandeController;
+use App\Controllers\PieceController;
 
 // Récupérer la route demandée
 $method = $_SERVER['REQUEST_METHOD'];
@@ -53,6 +55,40 @@ switch ($path) {
                 break;
             case 'PATCH':
                 $controller->changerEtape();;
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Méthode non autorisée'
+                ]);
+                break;
+        }
+        break;
+
+    // Création de commande : le catalogue de pièces alimente la liste déroulante du formulaire
+    case '/api/pieces':
+        $controller = new PieceController();
+        switch ($method) {
+            case 'GET':
+                $controller->index();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Méthode non autorisée'
+                ]);
+                break;
+        }
+        break;
+
+    // Création de commande : la commande + un ticket par pièce à fabriquer
+    case '/api/commandes':
+        $controller = new CommandeController();
+        switch ($method) {
+            case 'POST':
+                $controller->creer();
                 break;
             default:
                 http_response_code(405);
