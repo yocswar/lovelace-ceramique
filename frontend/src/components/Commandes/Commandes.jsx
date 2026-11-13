@@ -1,9 +1,9 @@
 import { useState } from "react";
 import Kanban from "../Kanban/Kanban";
-import "./Commande.css";
+import "./Commandes.css";
 
 //Affichage des commandes qui contient un kanban par commande avec ses tickets propres
-function Commande() {
+function Commandes() {
     const [commandes, setCommandes] = useState([{ id: 17 }]);
     // const [chargement, setChargement] = useState(true);
     const [message, setMessage] = useState("");
@@ -51,4 +51,4 @@ return (
     );
 }
 
-export default Commande;
+export default Commandes;
