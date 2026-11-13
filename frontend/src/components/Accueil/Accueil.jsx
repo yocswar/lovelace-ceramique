@@ -93,7 +93,7 @@ function Accueil() {
           production.
         </p>
 
-        <button type="button" onClick={() => navigate("/commandes/nouvelle")}>
+        <button type="button" onClick={() => navigate("/creation-commande")}>
           Nouvelle commande
         </button>
 

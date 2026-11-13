@@ -27,7 +27,7 @@ export default function App() {
       <Route path="/connexion" element={<FormulaireConnexion />} />
       <Route path="/" element={<RouteProtegee><Accueil /></RouteProtegee>} />
       <Route
-        path="/commandes/nouvelle"
+        path="/creation-commande"
         element={<RouteProtegee><FormulaireCommande /></RouteProtegee>}
       />
       <Route path="*" element={<p>Page introuvable</p>} />
