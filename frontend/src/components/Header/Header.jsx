@@ -4,6 +4,14 @@ import "./Header.css";
 function Header() {
     const navigate = useNavigate();
 
+    // Récupérer les informations de l'utilisateur connecté
+    const utilisateur = JSON.parse(
+        localStorage.getItem("utilisateur") || "null"
+    );
+
+    // Récupérer son nom
+    const nomUtilisateur = utilisateur?.nom || "Utilisateur";
+
     // Déconnexion de l'utilisateur
     function seDeconnecter() {
         localStorage.removeItem("token");
@@ -26,7 +34,7 @@ function Header() {
                 <span className="header_separator"></span>
 
                 <span className="header_user">
-                    Utilisateur
+                    {nomUtilisateur}
                 </span>
 
                 <span className="header_separator"></span>
