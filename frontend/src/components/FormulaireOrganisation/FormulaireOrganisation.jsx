@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./FormulaireOrganisation.css";
 
 const champsInitiaux = {
@@ -10,6 +11,7 @@ const champsInitiaux = {
 };
 
 function FormulaireOrganisation() {
+  const navigate = useNavigate();
   const [champs, setChamps] = useState(champsInitiaux);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -56,9 +58,8 @@ function FormulaireOrganisation() {
   }
 
   return (
-    <section className="inscription">
-      <h2>Créer une organisation</h2>
-      <p>Créez votre organisation et le compte administrateur associé.</p>
+    <main className="inscription">
+      <h1>Créer une organisation</h1>
 
       <form onSubmit={soumettre}>
         <label>
@@ -126,9 +127,14 @@ function FormulaireOrganisation() {
           />
         </label>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Création..." : "Créer le compte admin"}
-        </button>
+        <div className="inscription-boutons">
+          <button type="submit" className="btn btn--plein" disabled={loading}>
+            {loading ? "Création..." : "Créer le compte admin"}
+          </button>
+          <button className="btn btn--plein" type="button" onClick={() => navigate("/connexion")}>
+            Annuler
+          </button>
+        </div>
       </form>
 
       {message && (
@@ -144,7 +150,7 @@ function FormulaireOrganisation() {
           ))}
         </ul>
       )}
-    </section>
+    </main>
   );
 }
 

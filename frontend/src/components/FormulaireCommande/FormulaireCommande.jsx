@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getToken } from "../FormulaireConnexion/FormulaireConnexion";
 import "./FormulaireCommande.css";
+import IconePlus from "../IconePlus/IconePlus";
 
 // Adapte si ton FormulaireConnexion utilise une URL de base différente (ex. variable d'environnement)
 const API = "/api";
@@ -75,7 +76,7 @@ export default function FormulaireCommande() {
   };
 
   return (
-    <main className="app">
+    <main className="creation-commande">
     <header>
       <h1>Nouvelle commande</h1>
     </header>
@@ -93,7 +94,9 @@ export default function FormulaireCommande() {
         />
       </label>
 
-      <h2>Pièces</h2>
+      <label className="commande-lignes-label">
+        Pièces
+      </label>
       {lignes.map((ligne, index) => (
         <div key={index} className="commande-ligne">
           <select
@@ -119,24 +122,25 @@ export default function FormulaireCommande() {
           />
 
           {lignes.length > 1 && (
-            <button type="button" onClick={() => supprimerLigne(index)}>
+            <button type="button" className="btn btn--plein" onClick={() => supprimerLigne(index)}>
               Retirer
             </button>
           )}
         </div>
       ))}
 
-      <button type="button" onClick={ajouterLigne}>
-        + Ajouter une pièce
+      <button type="button" className="btn btn--plein" onClick={ajouterLigne}>
+        <IconePlus />
+        Ajouter une pièce
       </button>
 
       {erreur && <p role="alert">{erreur}</p>}
 
       <div className="commande-actions">
-        <button type="submit" disabled={envoiEnCours}>
+        <button type="submit" className="btn btn--plein" disabled={envoiEnCours}>
           {envoiEnCours ? "Création…" : "Créer la commande"}
         </button>
-        <button type="button" onClick={() => navigate("/")}>
+        <button type="button" className="btn btn--plein" onClick={() => navigate("/")}>
           Annuler
         </button>
       </div>

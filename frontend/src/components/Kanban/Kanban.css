@@ -3,7 +3,7 @@
   display: flex;
   gap: 1rem;
   overflow-x: auto;
-  padding-bottom: 1rem;
+  padding: 1rem;
 }
 
 /* Une colonne = une étape. Largeur fixe pour que toutes les colonnes soient alignées */

@@ -9,13 +9,20 @@
 :root {
   /* Couleurs */
   --couleur-fond: #e3d6c5;          /* beige de l'arrière-plan */
-  --couleur-principale: #9a4414;    /* brun des cartes et du texte sur blanc */
+  --couleur-principale: #974315;    /* brun des cartes et du texte sur blanc */
   --couleur-principale-fonce: #7d360f;
   --couleur-surface: #ffffff;       /* champs de saisie */
   --couleur-texte-clair: #ffffff;   /* texte sur fond brun */
   --couleur-contour-clair: #f3e6d6; /* bordure des boutons sur fond brun */
   --couleur-erreur-fond: #fdece4;
   --couleur-erreur-texte: #7a1f0b;
+  --couleur-focus: #ffffff;
+
+  /* Rouge brique : plus froid que le brun de la carte pour rester distinct,
+     mais désaturé pour ne pas agresser. Contrastes : 6,4:1 sur blanc, 8:1 (texte) sur le fond d'erreur. */
+  --couleur-erreur: #a63a32;
+  --couleur-erreur-fond: #fbeae6;
+  --couleur-erreur-texte: #7f2a24;
   --couleur-focus: #ffffff;
 
   /* Typographie */
@@ -53,14 +60,21 @@ html {
 }
 
 body {
-  max-width: 1440px;
-  margin: auto;
+  min-width: 320px;
   min-height: 100dvh;
+  margin: 0;
   color: var(--couleur-principale);
   font-family: var(--police);
   font-size: var(--taille-base);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+main,
+.main {
+  max-width: 1440px;
+  margin: auto;
+  padding: var(--espace-3);
 }
 
 h1,
@@ -88,7 +102,8 @@ input[type="email"],
 input[type="password"],
 input[type="search"],
 input[type="tel"],
-input[type="number"] {
+input[type="number"],
+textarea {
   width: 100%;
   min-height: 2.75rem;
   padding: 0.5rem 1.25rem;
@@ -120,6 +135,22 @@ input:disabled {
   cursor: not-allowed;
 }
 
+select {
+  min-height: 2.75rem;
+  padding: 0.5rem 1.25rem;
+  background-color: var(--couleur-surface);
+  color: var(--couleur-principale);
+  border: 2px solid transparent;
+  border-radius: var(--rayon-champ);
+  font-size: var(--taille-petit);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  font-family: var(--police);
+}
+
+select option {
+  font-family: var(--police);
+}
+
 /* ---------- Boutons ---------- */
 /* Base commune : à combiner avec une variante (.btn--contour, .btn--plein) */
 .btn {
@@ -145,7 +176,7 @@ input:disabled {
 .btn--contour {
   background-color: transparent;
   border-color: var(--couleur-contour-clair);
-  color: var(--couleur-texte-clair);
+  color: var(--couleur-contour-clair);
 }
 
 .btn--contour:hover:not(:disabled) {
@@ -166,6 +197,13 @@ input:disabled {
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.btn svg {
+  display: block;
+  width: 25px;
+  margin-right: 0.5rem;
+  color: inherit;
 }
 
 /* ---------- Utilitaires ---------- */

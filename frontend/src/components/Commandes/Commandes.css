@@ -9,13 +9,13 @@
     margin-bottom: 1.5rem;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid var(--couleur-principale);
 }
 
 .commande-header {
-    background: #8b5a3c;
+    background: var(--couleur-principale);
     color: white;
     padding: 1rem 1.25rem;
-    border-bottom: 3px solid #6f452f;
 }
 
 .commande-header h2 {

@@ -6,8 +6,9 @@
 /* Page : centre la carte au milieu de l'écran */
 .fc-page {
   min-height: 100dvh;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: var(--espace-3);
 }
 
@@ -23,6 +24,7 @@
   background-color: var(--couleur-principale);
   color: var(--couleur-texte-clair);
   border-radius: var(--rayon-carte);
+  margin-top: 60px;
 }
 
 /* Bloc marque : logo + nom de l'application */

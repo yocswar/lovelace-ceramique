@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import FormulaireOrganisation from "../FormulaireOrganisation/FormulaireOrganisation";
-import FormulaireConnexion from "../FormulaireConnexion/FormulaireConnexion";
-import Kanban from "../Kanban/Kanban";
 import Commandes from "../Commandes/Commandes";
+import "./Accueil.css";
+import IconePlus from "../IconePlus/IconePlus";
 
 function Accueil() {
   const navigate = useNavigate();
@@ -81,58 +80,13 @@ function Accueil() {
 
   return (
     <main className="app">
-      <header>
-        <h1>Lovelace Céramique</h1>
-        <p>Gestion de production pour les ateliers de céramique</p>
-      </header>
-
-      <section>
-        <h2>Bienvenue dans votre atelier</h2>
-
-        <p>
-          Suivez vos objets, vos étapes de fabrication et vos tâches de
-          production.
-        </p>
-
-        <button type="button" onClick={() => navigate("/creation-commande")}>
+      <section className="accueil-section">
+        <button type="button" className="btn btn--plein" onClick={() => navigate("/creation-commande")}>
+          <IconePlus />
           Nouvelle commande
         </button>
-
-        <button type="button" onClick={verifierConnexion} disabled={loading}>
-          {loading ? "Vérification..." : "Vérifier la connexion"}
-        </button>
-
-        {message && (
-          <p role="status" className={`connection-message ${status}`}>
-            {message}
-          </p>
-        )}
-
-        <button type="button" onClick={getUtilisateur} disabled={loading}>
-          {loading ? "Récupération..." : "Récupérer les utilisateurs"}
-        </button>
-
-        {message && (
-          <p role="status" className={`connection-message ${status}`}>
-            {message}
-          </p>
-        )}
-
-        {utilisateur.length > 0 && (
-          <div>
-            <h3>Liste des utilisateurs :</h3>
-            <ul>
-              {utilisateur.map((utilisateur) => (
-                <li key={utilisateur.id}>
-                  {utilisateur.nom} - {utilisateur.email}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </section>
       <Commandes/>
-      <FormulaireOrganisation/>
     </main>
   );
 }
