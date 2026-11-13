@@ -1,0 +1,25 @@
+.commande-section {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.commande-carte {
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.commande-header {
+    background: #8b5a3c;
+    color: white;
+    padding: 1rem 1.25rem;
+    border-bottom: 3px solid #6f452f;
+}
+
+.commande-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
