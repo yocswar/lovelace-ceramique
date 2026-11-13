@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import InscriptionForm from "../InscriptionForm/InscriptionForm";
 import FormulaireConnexion from "../FormulaireConnexion/FormulaireConnexion";
 import Kanban from "../Kanban/Kanban";
 
 function Accueil() {
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
@@ -90,6 +92,10 @@ function Accueil() {
           Suivez vos objets, vos étapes de fabrication et vos tâches de
           production.
         </p>
+
+        <button type="button" onClick={() => navigate("/commandes/nouvelle")}>
+          Nouvelle commande
+        </button>
 
         <button type="button" onClick={verifierConnexion} disabled={loading}>
           {loading ? "Vérification..." : "Vérifier la connexion"}

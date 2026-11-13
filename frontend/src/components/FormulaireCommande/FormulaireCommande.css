@@ -1,0 +1,47 @@
+/* Formulaire de création de commande : reprend les couleurs de App.css */
+.commande-form label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.commande-form input,
+.commande-form select {
+  display: block;
+  margin-top: 0.3rem;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.commande-form input[type="text"] {
+  width: 100%;
+}
+
+/* Une ligne = une pièce + sa quantité + le bouton Retirer */
+.commande-ligne {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.commande-ligne select {
+  flex: 1;
+  margin-top: 0;
+}
+
+.commande-ligne input {
+  width: 80px;
+  margin-top: 0;
+}
+
+.commande-ligne button {
+  margin-top: 0;
+}
+
+.commande-actions {
+  display: flex;
+  gap: 0.75rem;
+}
