@@ -1,6 +1,7 @@
 // App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import FormulaireConnexion, { getToken } from "./components/FormulaireConnexion/FormulaireConnexion";
+import FormulaireOrganisation from "./components/FormulaireOrganisation/FormulaireOrganisation";
 import Accueil from "./components/Accueil/Accueil";
 import Header from "./components/Header/Header";
 import FormulaireCommande from "./components/FormulaireCommande/FormulaireCommande";
@@ -24,6 +25,7 @@ function RouteProtegee({ children }) {
 export default function App() {
   return (
     <Routes>
+      <Route path="/creation-organisation" element={<FormulaireOrganisation />} />
       <Route path="/connexion" element={<FormulaireConnexion />} />
       <Route path="/" element={<RouteProtegee><Accueil /></RouteProtegee>} />
       <Route

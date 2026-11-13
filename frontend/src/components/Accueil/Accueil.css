@@ -1,0 +1,6 @@
+section.accueil-section {
+    display: flex;
+    gap: 20px;
+    justify-content: right;
+    margin-bottom: 20px;
+}

@@ -1,0 +1,59 @@
+main.inscription {
+  max-width: 900px;
+  margin: 90px auto;
+  padding: 1.5rem;
+  border-radius: var(--rayon-carte);
+  background-color: var(--couleur-fond);
+}
+
+.inscription h1 {
+  margin-bottom: 4rem;
+}
+
+.inscription form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-items: center;
+}
+
+.inscription label {
+  display: grid;
+  width: 100%;
+  gap: 0.4rem;
+  font-weight: 500;
+}
+
+.inscription input {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+  width: fit-content;
+}
+
+.inscription-boutons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.connection-message {
+  margin-top: 1rem;
+  display: block;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background-color: var(--couleur-erreur);
+  color: var(--couleur-texte-clair);
+}
+
+.erreurs-liste {
+  margin: 1rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--couleur-erreur-texte);
+}
+
+.inscription.inscription-succes {
+  max-width: 32rem;
+}
