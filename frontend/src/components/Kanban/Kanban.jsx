@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
 import "./Kanban.css";
 
-// Page d'accueil (US.14) : une colonne par étape de l'atelier, une carte par pièce à fabriquer.
-// Sur chaque carte, un bouton (US.12) passe la pièce à l'étape suivante.
-function Kanban({commandeId}) {
-  const [etapes, setEtapes] = useState([]); // les colonnes, dans l'ordre de l'atelier
-  const [tickets, setTickets] = useState([]); // les cartes (une pièce = un ticket)
-  const [loading, setLoading] = useState(true); // true tant que la première réponse n'est pas arrivée
-  const [message, setMessage] = useState(""); // texte affiché à l'utilisateur
-  const [status, setStatus] = useState(""); // "success" ou "error" : choisit la couleur du message
-  const [enCours, setEnCours] = useState(null); // id de la carte en train de changer d'étape (bloque le double clic)
+// Kanban d'une commande (US.14). On glisse une carte dans n'importe quelle colonne pour changer son étape (US.12).
+function Kanban({ commandeId }) {
+  const [etapes, setEtapes] = useState([]);
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("");
+  const [enCours, setEnCours] = useState(null); // carte en cours d'envoi au back
+  const [ticketGlisse, setTicketGlisse] = useState(null); // carte en train d'être glissée
+  const [colonneSurvolee, setColonneSurvolee] = useState(null); // colonne sous la souris pendant le glisser
 
-  // useEffect avec [] : lancé une seule fois, quand la page s'affiche
+  // [commandeId] : on recharge si la commande change
   useEffect(() => {
     async function chargerKanban() {
       try {
-        const response = await fetch("/api/tickets?id=" + commandeId); // GET par défaut : on lit
+        const response = await fetch("/api/tickets?id=" + commandeId);
         const data = await response.json();
 
         if (!response.ok) {
@@ -33,21 +34,19 @@ function Kanban({commandeId}) {
     }
 
     chargerKanban();
-  }, []);
+  }, [commandeId]);
 
-  // US.12 : demande au back de passer la pièce à l'étape suivante
-  async function passerEtapeSuivante(ticketId) {
+  async function changerEtape(ticketId, etapeId) {
     setEnCours(ticketId);
     setMessage("");
 
     try {
-      // PATCH = modifier une partie d'une donnée existante (seulement l'étape du ticket)
       const response = await fetch(`/api/tickets`, {
         method: "PATCH",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id: ticketId })
+        body: JSON.stringify({ id: ticketId, etape_id: etapeId }),
       });
       const data = await response.json();
 
@@ -55,7 +54,7 @@ function Kanban({commandeId}) {
         throw new Error(data.message || "Changement d'étape impossible");
       }
 
-      // Mise à jour locale : la carte change de colonne sans recharger toute la page
+      // Mise à jour locale : la carte change de colonne sans recharger la page
       setTickets((prev) =>
         prev.map((ticket) =>
           ticket.id === ticketId ? { ...ticket, etape_id: data.etape.id } : ticket,
@@ -71,12 +70,14 @@ function Kanban({commandeId}) {
     }
   }
 
+  function finGlisser() {
+    setTicketGlisse(null);
+    setColonneSurvolee(null);
+  }
+
   if (loading) {
     return <p>Chargement de l&apos;atelier…</p>;
   }
-
-  // La dernière colonne (Terminé) n'a pas de bouton : il n'y a pas d'étape après
-  const derniereEtape = etapes[etapes.length - 1];
 
   return (
     <section className="kanban-section">
@@ -90,34 +91,49 @@ function Kanban({commandeId}) {
 
       <div className="kanban">
         {etapes.map((etape) => {
-          // Les cartes de cette colonne : les tickets qui sont à cette étape
           const cartes = tickets.filter((ticket) => ticket.etape_id === etape.id);
+          // Toutes les colonnes acceptent la carte, sauf celle où elle est déjà
+          const estCible = ticketGlisse !== null && ticketGlisse.etape_id !== etape.id;
 
           return (
-            <div key={etape.id} className="kanban-colonne">
+            <div
+              key={etape.id}
+              className={`kanban-colonne ${estCible && colonneSurvolee === etape.id ? "kanban-colonne--cible" : ""}`}
+              onDragOver={(event) => {
+                if (!estCible) return;
+                event.preventDefault(); // preventDefault = « j'accepte la carte ici »
+                setColonneSurvolee(etape.id);
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                // dataTransfer stocke du texte : Number() le remet en nombre, comme ticket.id
+                const ticketId = Number(event.dataTransfer.getData("text/plain"));
+                finGlisser();
+                changerEtape(ticketId, etape.id);
+              }}
+            >
               <h3>
                 {etape.nom}
                 <span className="kanban-compteur">{cartes.length}</span>
               </h3>
 
               {cartes.map((ticket) => (
-                <article key={ticket.id} className="kanban-carte">
+                <article
+                  key={ticket.id}
+                  className={`kanban-carte ${enCours === ticket.id ? "kanban-carte--en-cours" : ""}`}
+                  draggable={enCours !== ticket.id} // pas de nouveau glisser pendant l'envoi
+                  onDragStart={(event) => {
+                    event.dataTransfer.setData("text/plain", String(ticket.id));
+                    // dataTransfer n'est pas lisible pendant le survol : on garde la carte dans un état
+                    setTicketGlisse(ticket);
+                  }}
+                  onDragEnd={finGlisser}
+                >
                   <p className="kanban-piece">{ticket.piece}</p>
                   <p>
                     Commande n°{ticket.commande_id} · {ticket.nom_client}
                   </p>
-                  {/* ?? : si personne n'est assigné (null), on l'écrit clairement */}
                   <p className="kanban-artisan">{ticket.artisan ?? "Non assignée"}</p>
-
-                  {etape.id !== derniereEtape.id && (
-                    <button
-                      type="button"
-                      onClick={() => passerEtapeSuivante(ticket.id)}
-                      disabled={enCours === ticket.id}
-                    >
-                      {enCours === ticket.id ? "…" : "Étape suivante →"}
-                    </button>
-                  )}
                 </article>
               ))}
             </div>

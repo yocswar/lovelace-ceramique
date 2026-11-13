@@ -54,7 +54,7 @@ switch ($path) {
                 $controller->index();
                 break;
             case 'PATCH':
-                $controller->etapeSuivante();
+                $controller->changerEtape();;
                 break;
             default:
                 http_response_code(405);
