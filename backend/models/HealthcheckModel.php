@@ -1,13 +1,16 @@
 <?php
-// Contrôleur de la page de test.
-// Appelé depuis index.php quand l'URL est "/test".
+// Modèle pour la route /api/healthcheck
 
 declare(strict_types=1);
+
+namespace App\models;
+
+use PDO;
 
 final class HealthcheckModel
 {
     private PDO $pdo;
-    
+
     public function __construct()
     {
         // Connexion à PostgreSQL

@@ -1,11 +1,12 @@
 <?php
-// Contrôleur de la page de test.
-// Appelé depuis index.php quand l'URL est "/test".
+// Contrôleur pour la route /api/healthcheck
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../models/HealthcheckModel.php';
-require_once __DIR__ . '/../views/HealthcheckView.php';
+namespace App\Controllers;
+
+use App\Models\HealthcheckModel;
+use App\Views\HealthcheckView;
 
 final class HealthcheckController
 {
@@ -18,7 +19,7 @@ final class HealthcheckController
             $result = $healthcheckModel->ping();
 
             $healthcheckView->success($result);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $message = $e->getMessage();
             error_log($message);
             $healthcheckView->error($message);

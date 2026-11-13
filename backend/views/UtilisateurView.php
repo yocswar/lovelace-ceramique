@@ -1,6 +1,5 @@
 <?php
-// Contrôleur de la page de test.
-// Appelé depuis index.php quand l'URL est "/test".
+// Vue pour la route /api/utilisateurs
 
 declare(strict_types=1);
 

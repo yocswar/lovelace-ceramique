@@ -1,0 +1,11 @@
+{
+  "name": "lovelace/backend",
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "App\\Controllers\\": "controllers/",
+      "App\\Models\\": "models/",
+      "App\\Views\\": "views/"
+    }
+  }
+}

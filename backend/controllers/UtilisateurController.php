@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../models/OrganisationModel.php';
-require_once __DIR__ . '/../models/UtilisateurModel.php';
+namespace App\Controllers;
 
+use App\Models\OrganisationModel;
+use App\Models\UtilisateurModel;
 // CRUD utilisateur — pour l'instant : créer (avec son organisation).
 // À venir : lister, modifier, supprimer.
 final class UtilisateurController
@@ -39,7 +40,7 @@ final class UtilisateurController
         }
 
         try {
-            /** @var PDO $pdo */
+            //  @var \PDO $pdo
             $pdo = require __DIR__ . '/../config/db.php';
             $organisationModel = new OrganisationModel($pdo);
             $utilisateurModel = new UtilisateurModel($pdo);
@@ -84,7 +85,7 @@ final class UtilisateurController
                     'role' => 'Administrateur',
                 ],
             ]);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             if (isset($pdo) && $pdo->inTransaction()) {
                 $pdo->rollBack();
             }

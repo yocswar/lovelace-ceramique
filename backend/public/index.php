@@ -2,12 +2,20 @@
 
 declare(strict_types=1);
 
-// Chargement des contrôleurs
+// Chargement automatique des classes via Composer
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Contrôleurs migrés vers PSR-4
+
+use App\Controllers\UtilisateurController;
+use App\Controllers\HealthcheckController;
+
+// Contrôleurs non encore migrés
+
 require_once __DIR__ . '/../controllers/HomeController.php';
 require_once __DIR__ . '/../controllers/TestController.php';
 require_once __DIR__ . '/../controllers/ExampleController.php';
-require_once __DIR__ . '/../controllers/HealthcheckController.php';
-require_once __DIR__ . '/../controllers/UtilisateurController.php';
 
 // Récupérer la route demandée
 $method = $_SERVER['REQUEST_METHOD'];

@@ -2,7 +2,12 @@
 
 declare(strict_types=1);
 
+namespace App\Models;
+
+use PDO;
+
 // Accès à la table utilisateur (requêtes SQL uniquement).
+
 final class UtilisateurModel
 {
     public function __construct(
@@ -20,8 +25,8 @@ final class UtilisateurModel
     ): int {
         $stmt = $this->pdo->prepare(
             'INSERT INTO utilisateur (identifiant, mdp, email, nom, organisation_id, role)
-             VALUES (:identifiant, :mdp, :email, :nom, :organisation_id, :role)
-             RETURNING id'
+            VALUES (:identifiant, :mdp, :email, :nom, :organisation_id, :role)
+            RETURNING id'
         );
         $stmt->execute([
             'identifiant' => $identifiant,
