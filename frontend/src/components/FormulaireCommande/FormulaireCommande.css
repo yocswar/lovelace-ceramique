@@ -6,7 +6,7 @@ main.creation-commande {
   padding: var(--espace-3);
 }
 
-header {
+.creation-commande header {
   margin: var(--espace-3) 0;
 }
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import EcranSucces from "../EcranSucces/EcranSucces";
 import "./FormulaireOrganisation.css";
 
 const champsInitiaux = {
@@ -55,6 +56,20 @@ function FormulaireOrganisation() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // Écran de confirmation : remplace le formulaire
+  if (status === "success") {
+    return (
+      <main className="inscription inscription-succes">
+        <EcranSucces
+          titre="Organisation créée"
+          message={message}
+          libelleBouton="Aller à la connexion"
+          onContinuer={() => navigate("/connexion")}
+        />
+      </main>
+    );
   }
 
   return (
@@ -137,8 +152,8 @@ function FormulaireOrganisation() {
         </div>
       </form>
 
-      {message && (
-        <p role="status" className={`connection-message ${status}`}>
+      {status === "error" && message && (
+        <p role="status" className="connection-message error">
           {message}
         </p>
       )}

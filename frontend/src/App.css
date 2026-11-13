@@ -68,6 +68,7 @@ body {
   font-size: var(--taille-base);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  scrollbar-color: var(--couleur-principale) var(--couleur-fond);
 }
 
 main,

@@ -24,7 +24,7 @@
 
 /* Le nombre de pièces dans la colonne : Claire voit d'un coup d'œil où ça s'accumule */
 .kanban-compteur {
-  background: #8b5a3c;
+  background: var(--couleur-principale);
   color: #fff;
   border-radius: 999px;
   padding: 0 0.5rem;
@@ -56,7 +56,7 @@
 
 /* La seule colonne où l'on peut lâcher la carte : l'étape suivante (règle d'US.12) */
 .kanban-colonne--cible {
-  outline: 2px dashed #8b5a3c;
+  outline: 2px dashed var(--couleur-principale);
   background: #efe3d8;
 }
 

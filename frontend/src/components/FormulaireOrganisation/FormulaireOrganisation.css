@@ -48,9 +48,12 @@ main.inscription {
   color: var(--couleur-texte-clair);
 }
 
-
 .erreurs-liste {
   margin: 1rem 0 0;
   padding-left: 1.2rem;
-  color: #b42318;
+  color: var(--couleur-erreur-texte);
+}
+
+.inscription.inscription-succes {
+  max-width: 32rem;
 }

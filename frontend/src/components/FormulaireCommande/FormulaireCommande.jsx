@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getToken } from "../FormulaireConnexion/FormulaireConnexion";
 import "./FormulaireCommande.css";
 import IconePlus from "../IconePlus/IconePlus";
+import EcranSucces from "../EcranSucces/EcranSucces";
 
 // Adapte si ton FormulaireConnexion utilise une URL de base différente (ex. variable d'environnement)
 const API = "/api";
@@ -15,6 +16,7 @@ export default function FormulaireCommande() {
   const [lignes, setLignes] = useState([{ piece_id: "", quantite: 1 }]);
   const [erreur, setErreur] = useState("");
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
+  const [commandeCreee, setCommandeCreee] = useState(false);
 
   const entetes = {
     "Content-Type": "application/json",
@@ -64,7 +66,7 @@ export default function FormulaireCommande() {
       const data = await reponse.json();
 
       if (data.status === "ok") {
-        navigate("/"); // retour à la vue principale
+        setCommandeCreee(true); // affiche l'écran de confirmation à la place du formulaire
       } else {
         setErreur(data.message);
       }
@@ -74,6 +76,19 @@ export default function FormulaireCommande() {
       setEnvoiEnCours(false);
     }
   };
+
+  if (commandeCreee) {
+    return (
+      <main className="creation-commande">
+        <EcranSucces
+          titre="Commande créée"
+          message={`La commande de « ${nomClient} » a bien été enregistrée.`}
+          libelleBouton="Retour à l'accueil"
+          onContinuer={() => navigate("/")}
+        />
+      </main>
+    );
+  }
 
   return (
     <main className="creation-commande">
