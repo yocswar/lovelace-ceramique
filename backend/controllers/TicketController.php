@@ -46,11 +46,12 @@ final class TicketController
         }
     }
 
-    // US.12 : passe le ticket $id à l'étape suivante
-    public function etapeSuivante(): void
+        // US.12 : déplace le ticket vers l'étape choisie par glisser-déposer (en avant, en arrière ou en Perte)
+    public function changerEtape(): void
     {
         $data = json_decode(file_get_contents('php://input'), true);
         $id = (int) ($data['id'] ?? 0);
+        $etapeId = (int) ($data['etape_id'] ?? 0);
 
         try {
             /** @var PDO $pdo */
@@ -58,21 +59,20 @@ final class TicketController
             $ticketModel = new TicketModel($pdo);
             $etapeModel = new EtapeModel($pdo);
 
-            $ticket = $ticketModel->findById($id);
-            if ($ticket === null) {
+            if ($ticketModel->findById($id) === null) {
                 $this->view->error(404, 'Ticket introuvable');
                 return;
             }
 
-            $suivante = $etapeModel->findSuivante((int) $ticket['ordre']);
-            if ($suivante === null) {
-                // 422 = la demande est comprise mais impossible : la pièce est déjà terminée
-                $this->view->error(422, 'Cette pièce est déjà à la dernière étape');
+            // On vérifie l'étape avant d'écrire : un id inventé donnerait sinon une erreur 500 de la base
+            $etape = $etapeModel->findById($etapeId);
+            if ($etape === null) {
+                $this->view->error(404, 'Étape introuvable');
                 return;
             }
 
-            $ticketModel->updateEtape($id, (int) $suivante['id']);
-            $this->view->etapeChangee($id, $suivante);
+            $ticketModel->updateEtape($id, $etapeId);
+            $this->view->etapeChangee($id, $etape);
         } catch (Throwable $e) {
             error_log($e->getMessage());
             $this->view->error(500, 'Impossible de changer l\'étape');
