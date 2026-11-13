@@ -36,4 +36,14 @@ final class EtapeModel
 
         return $etape === false ? null : $etape;
     }
+
+        // Une étape par son id (null si elle n'existe pas) : sert à vérifier la colonne de destination
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare('SELECT id, nom, ordre FROM etape WHERE id = :id');
+        $stmt->execute(['id' => $id]);
+        $etape = $stmt->fetch();
+
+        return $etape === false ? null : $etape;
+    }
 }

@@ -54,7 +54,18 @@
   font-style: italic;
 }
 
-.kanban-carte button {
-  width: 100%;
-  margin-top: 0.4rem;
+/* La seule colonne où l'on peut lâcher la carte : l'étape suivante (règle d'US.12) */
+.kanban-colonne--cible {
+  outline: 2px dashed #8b5a3c;
+  background: #efe3d8;
+}
+
+/* La main qui attrape : on comprend que la carte se déplace */
+.kanban-carte {
+  cursor: grab;
+}
+
+/* Carte en cours d'envoi au back */
+.kanban-carte--en-cours {
+  opacity: 0.5;
 }
