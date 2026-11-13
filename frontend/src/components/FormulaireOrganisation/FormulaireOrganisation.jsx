@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./InscriptionForm.css";
+import "./FormulaireOrganisation.css";
 
 const champsInitiaux = {
   organisation_nom: "",
@@ -9,7 +9,7 @@ const champsInitiaux = {
   mdp: "",
 };
 
-function InscriptionForm() {
+function FormulaireOrganisation() {
   const [champs, setChamps] = useState(champsInitiaux);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -148,4 +148,4 @@ function InscriptionForm() {
   );
 }
 
-export default InscriptionForm;
+export default FormulaireOrganisation;

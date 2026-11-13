@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FormulaireConnexion.css";
+import LogoPotterPilot from "../LogoPotterPilot/LogoPotterPilot.jsx";
 
 /**
  * Formulaire d'authentification.
@@ -101,12 +102,15 @@ function FormulaireConnexion() {
   }
 
   return (
-    <>
+    <main className="fc-page">
+      <div className="fc-marque">
+        <LogoPotterPilot className="fc-logo" />
+        <h1 className="fc-nom-appli">PotterPilot</h1>
+      </div>
       <form className="fc-form" onSubmit={handleSubmit} aria-labelledby={`${uid}-titre`}>
         <h1 id={`${uid}-titre`} className="fc-titre">
-          Connexion
+          Connecte-toi à ton espace
         </h1>
-        <p className="fc-sous-titre">Accédez à votre espace avec votre compte.</p>
 
         {erreur && (
           <div id={idErreur} className="fc-erreur" role="alert">
@@ -128,6 +132,7 @@ function FormulaireConnexion() {
             aria-invalid={erreur ? "true" : undefined}
             aria-describedby={erreur ? idErreur : undefined}
             disabled={chargement}
+            placeholder="Identifiant"
           />
         </div>
 
@@ -145,15 +150,21 @@ function FormulaireConnexion() {
               aria-invalid={erreur ? "true" : undefined}
               aria-describedby={erreur ? idErreur : undefined}
               disabled={chargement}
+              placeholder="Mot de passe"
             />
           </div>
         </div>
 
-        <button type="submit" className="fc-envoyer" disabled={chargement}>
-          {chargement ? "Connexion en cours…" : "Se connecter"}
-        </button>
+        <div className="fc-actions">
+          <button type="submit" className="btn btn--contour fc-envoyer" disabled={chargement}>
+            {chargement ? "Connexion en cours…" : "Se connecter"}
+          </button>
+          <button type="button" className="btn btn--contour" onClick={() => navigate("/creation-organisation")}>
+            Créer une organisation
+          </button>
+        </div>
       </form>
-    </>
+    </main>
   );
 }
 

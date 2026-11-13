@@ -1,5 +1,5 @@
 import { useState } from "react";
-import InscriptionForm from "../InscriptionForm/InscriptionForm";
+import FormulaireOrganisation from "../FormulaireOrganisation/FormulaireOrganisation";
 import FormulaireConnexion from "../FormulaireConnexion/FormulaireConnexion";
 import Kanban from "../Kanban/Kanban";
 
@@ -125,7 +125,7 @@ function Accueil() {
         )}
       </section>
       <Kanban commandeId={17} />
-      <InscriptionForm/>
+      <FormulaireOrganisation/>
     </main>
   );
 }
