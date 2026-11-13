@@ -2,6 +2,7 @@ import { useState } from "react";
 import FormulaireOrganisation from "../FormulaireOrganisation/FormulaireOrganisation";
 import FormulaireConnexion from "../FormulaireConnexion/FormulaireConnexion";
 import Kanban from "../Kanban/Kanban";
+import Commandes from "../Commandes/Commandes";
 
 function Accueil() {
   const [message, setMessage] = useState("");
@@ -124,7 +125,8 @@ function Accueil() {
           </div>
         )}
       </section>
-      <Kanban commandeId={17} />
+      <Commandes/>
+      {/* Le composant Commande englobe le kanban */}
       <FormulaireOrganisation/>
     </main>
   );

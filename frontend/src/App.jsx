@@ -3,11 +3,22 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-
 import FormulaireConnexion, { getToken } from "./components/FormulaireConnexion/FormulaireConnexion";
 import FormulaireOrganisation from "./components/FormulaireOrganisation/FormulaireOrganisation";
 import Accueil from "./components/Accueil/Accueil";
+import Header from "./components/Header/Header";
 import "./App.css";
 
 // Bloque l'accès aux pages privées si l'utilisateur n'a pas de token
 function RouteProtegee({ children }) {
-  return getToken() ? children : <Navigate to="/connexion" replace />;
+  if (!getToken()) {
+    return <Navigate to="/connexion" replace />;
+  }
+
+  // Ajout d'un return pour afficher unniquement le header quand l'utilisateur est connectée
+  return (
+    <>
+      <Header />
+      {children}
+    </>
+  );
 }
 
 export default function App() {
