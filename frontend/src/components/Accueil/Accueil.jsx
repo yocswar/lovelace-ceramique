@@ -1,15 +1,18 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import InscriptionForm from "../InscriptionForm/InscriptionForm";
 import FormulaireConnexion from "../FormulaireConnexion/FormulaireConnexion";
 import Kanban from "../Kanban/Kanban";
+import FormulaireCommande from "../FormulaireCommande/FormulaireCommande";
 
 function Accueil() {
-  const navigate = useNavigate();
+  // true = on affiche le formulaire de création à la place de l'accueil (l'adresse reste « / »)
+  const [afficherFormulaire, setAfficherFormulaire] = useState(false);
+  // La commande affichée dans le Kanban : celle qu'on vient de créer, sinon la 17 par défaut
+  const [commandeId, setCommandeId] = useState(17);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-  const [utilisateur, setUtilisateur] = useState([]);
+  const [utilisateurs, setUtilisateurs] = useState([]);
 
   async function verifierConnexion() {
     setLoading(true);
@@ -44,7 +47,7 @@ function Accueil() {
     }
   }
 
-  async function getUtilisateur() {
+  async function getUtilisateurs() {
     setLoading(true);
     setMessage("");
     setStatus("");
@@ -66,7 +69,7 @@ function Accueil() {
       if (data.status === "ok" && data.database === "connected") {
         setMessage(data.message);
         setStatus("success");
-        setUtilisateur(data.result);
+        setUtilisateurs(data.result);
       } else {
         throw new Error("La base de données est indisponible");
       }
@@ -76,6 +79,18 @@ function Accueil() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (afficherFormulaire) {
+    return (
+      <FormulaireCommande
+        onCreee={(id) => {
+          setCommandeId(id);
+          setAfficherFormulaire(false);
+        }}
+        onAnnuler={() => setAfficherFormulaire(false)}
+      />
+    );
   }
 
   return (
@@ -93,7 +108,7 @@ function Accueil() {
           production.
         </p>
 
-        <button type="button" onClick={() => navigate("/commandes/nouvelle")}>
+        <button type="button" onClick={() => setAfficherFormulaire(true)}>
           Nouvelle commande
         </button>
 
@@ -107,7 +122,7 @@ function Accueil() {
           </p>
         )}
 
-        <button type="button" onClick={getUtilisateur} disabled={loading}>
+        <button type="button" onClick={getUtilisateurs} disabled={loading}>
           {loading ? "Récupération..." : "Récupérer les utilisateurs"}
         </button>
 
@@ -117,11 +132,11 @@ function Accueil() {
           </p>
         )}
 
-        {utilisateur.length > 0 && (
+        {utilisateurs.length > 0 && (
           <div>
             <h3>Liste des utilisateurs :</h3>
             <ul>
-              {utilisateur.map((utilisateur) => (
+              {utilisateurs.map((utilisateur) => (
                 <li key={utilisateur.id}>
                   {utilisateur.nom} - {utilisateur.email}
                 </li>
@@ -130,7 +145,7 @@ function Accueil() {
           </div>
         )}
       </section>
-      <Kanban commandeId={32} />
+      <Kanban commandeId={commandeId} />
       <InscriptionForm/>
     </main>
   );

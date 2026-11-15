@@ -1,14 +1,13 @@
 // FormulaireCommande.jsx : création d'une commande (nom du client + pièces à fabriquer)
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { getToken } from "../FormulaireConnexion/FormulaireConnexion";
 import "./FormulaireCommande.css";
 
 // Adapte si ton FormulaireConnexion utilise une URL de base différente (ex. variable d'environnement)
 const API = "/api";
 
-export default function FormulaireCommande() {
-  const navigate = useNavigate();
+// onCreee(commandeId) : appelée après une création réussie ; onAnnuler() : appelée par le bouton Annuler
+export default function FormulaireCommande({ onCreee, onAnnuler }) {
   const [pieces, setPieces] = useState([]);
   const [nomClient, setNomClient] = useState("");
   const [lignes, setLignes] = useState([{ piece_id: "", quantite: 1 }]);
@@ -63,7 +62,7 @@ export default function FormulaireCommande() {
       const data = await reponse.json();
 
       if (data.status === "ok") {
-        navigate("/"); // retour à la vue principale
+        onCreee(data.commande_id); // l'accueil reprend la main et affiche cette commande
       } else {
         setErreur(data.message);
       }
@@ -136,7 +135,7 @@ export default function FormulaireCommande() {
         <button type="submit" disabled={envoiEnCours}>
           {envoiEnCours ? "Création…" : "Créer la commande"}
         </button>
-        <button type="button" onClick={() => navigate("/")}>
+        <button type="button" onClick={onAnnuler}>
           Annuler
         </button>
       </div>
