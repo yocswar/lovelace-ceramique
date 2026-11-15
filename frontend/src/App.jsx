@@ -1,4 +1,3 @@
-// App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import FormulaireConnexion, { getToken } from "./components/FormulaireConnexion/FormulaireConnexion";
 import Accueil from "./components/Accueil/Accueil";
@@ -14,11 +13,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/connexion" element={<FormulaireConnexion />} />
-      <Route path="/" element={<RouteProtegee><Accueil /></RouteProtegee>} />
-      <Route
-        path="/commandes/nouvelle"
-        element={<RouteProtegee><FormulaireCommande /></RouteProtegee>}
-      />
+      <Route path="/" element={<RouteProtegee><FormulaireCommande /></RouteProtegee>} />
+      <Route path="/accueil" element={<RouteProtegee><Accueil /></RouteProtegee>} />
+      <Route path="/commandes/nouvelle" element={<Navigate to="/" replace />} />
       <Route path="*" element={<p>Page introuvable</p>} />
     </Routes>
   );
