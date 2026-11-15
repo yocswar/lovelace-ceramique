@@ -1,0 +1,172 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import EcranSucces from "../EcranSucces/EcranSucces";
+import "./FormulaireOrganisation.css";
+
+const champsInitiaux = {
+  organisation_nom: "",
+  nom: "",
+  identifiant: "",
+  email: "",
+  mdp: "",
+};
+
+function FormulaireOrganisation() {
+  const navigate = useNavigate();
+  const [champs, setChamps] = useState(champsInitiaux);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("");
+  const [erreurs, setErreurs] = useState([]);
+
+  function modifierChamp(event) {
+    const { name, value } = event.target;
+    setChamps((precedent) => ({ ...precedent, [name]: value }));
+  }
+
+  async function soumettre(event) {
+    event.preventDefault();
+    setLoading(true);
+    setMessage("");
+    setStatus("");
+    setErreurs([]);
+
+    try {
+      const response = await fetch("/api/utilisateurs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(champs),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErreurs(Array.isArray(data.erreurs) ? data.erreurs : []);
+        throw new Error(data.message || "Création impossible");
+      }
+
+      setMessage(
+        `Compte créé : ${data.utilisateur.identifiant} (admin) pour « ${data.organisation.nom} ».`,
+      );
+      setStatus("success");
+      setChamps(champsInitiaux);
+    } catch (error) {
+      setMessage(error.message);
+      setStatus("error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Écran de confirmation : remplace le formulaire
+  if (status === "success") {
+    return (
+      <main className="inscription inscription-succes">
+        <EcranSucces
+          titre="Organisation créée"
+          message={message}
+          libelleBouton="Aller à la connexion"
+          onContinuer={() => navigate("/connexion")}
+        />
+      </main>
+    );
+  }
+
+  return (
+    <main className="inscription">
+      <h1>Créer une organisation</h1>
+
+      <form onSubmit={soumettre}>
+        <label>
+          Nom de l&apos;organisation
+          <input
+            type="text"
+            name="organisation_nom"
+            value={champs.organisation_nom}
+            onChange={modifierChamp}
+            maxLength={50}
+            required
+            autoComplete="organization"
+          />
+        </label>
+
+        <label>
+          Nom de l&apos;administrateur
+          <input
+            type="text"
+            name="nom"
+            value={champs.nom}
+            onChange={modifierChamp}
+            maxLength={50}
+            required
+            autoComplete="name"
+          />
+        </label>
+
+        <label>
+          Identifiant
+          <input
+            type="text"
+            name="identifiant"
+            value={champs.identifiant}
+            onChange={modifierChamp}
+            maxLength={25}
+            required
+            autoComplete="username"
+          />
+        </label>
+
+        <label>
+          Email
+          <input
+            type="email"
+            name="email"
+            value={champs.email}
+            onChange={modifierChamp}
+            maxLength={120}
+            required
+            autoComplete="email"
+          />
+        </label>
+
+        <label>
+          Mot de passe
+          <input
+            type="password"
+            name="mdp"
+            value={champs.mdp}
+            onChange={modifierChamp}
+            minLength={8}
+            required
+            autoComplete="new-password"
+          />
+        </label>
+
+        <div className="inscription-boutons">
+          <button type="submit" className="btn btn--plein" disabled={loading}>
+            {loading ? "Création..." : "Créer le compte admin"}
+          </button>
+          <button className="btn btn--plein" type="button" onClick={() => navigate("/connexion")}>
+            Annuler
+          </button>
+        </div>
+      </form>
+
+      {status === "error" && message && (
+        <p role="status" className="connection-message error">
+          {message}
+        </p>
+      )}
+
+      {erreurs.length > 0 && (
+        <ul className="erreurs-liste">
+          {erreurs.map((erreur) => (
+            <li key={erreur}>{erreur}</li>
+          ))}
+        </ul>
+      )}
+    </main>
+  );
+}
+
+export default FormulaireOrganisation;

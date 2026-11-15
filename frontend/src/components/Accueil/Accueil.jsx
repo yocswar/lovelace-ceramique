@@ -3,6 +3,9 @@ import InscriptionForm from "../InscriptionForm/InscriptionForm";
 import FormulaireConnexion from "../FormulaireConnexion/FormulaireConnexion";
 import Kanban from "../Kanban/Kanban";
 import FormulaireCommande from "../FormulaireCommande/FormulaireCommande";
+import Commandes from "../Commandes/Commandes";
+import "./Accueil.css";
+import IconePlus from "../IconePlus/IconePlus";
 
 function Accueil() {
   // true = on affiche le formulaire de création à la place de l'accueil (l'adresse reste « / »)

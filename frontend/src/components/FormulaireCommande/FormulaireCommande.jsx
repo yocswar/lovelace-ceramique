@@ -1,18 +1,22 @@
 // FormulaireCommande.jsx : création d'une commande (nom du client + pièces à fabriquer)
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getToken } from "../FormulaireConnexion/FormulaireConnexion";
 import "./FormulaireCommande.css";
+import IconePlus from "../IconePlus/IconePlus";
+import EcranSucces from "../EcranSucces/EcranSucces";
 
 // Adapte si ton FormulaireConnexion utilise une URL de base différente (ex. variable d'environnement)
 const API = "/api";
 
-// onCreee(commandeId) : appelée après une création réussie ; onAnnuler() : appelée par le bouton Annuler
-export default function FormulaireCommande({ onCreee, onAnnuler }) {
+export default function FormulaireCommande() {
+  const navigate = useNavigate();
   const [pieces, setPieces] = useState([]);
   const [nomClient, setNomClient] = useState("");
   const [lignes, setLignes] = useState([{ piece_id: "", quantite: 1 }]);
   const [erreur, setErreur] = useState("");
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
+  const [commandeCreee, setCommandeCreee] = useState(false);
 
   const entetes = {
     "Content-Type": "application/json",
@@ -62,7 +66,7 @@ export default function FormulaireCommande({ onCreee, onAnnuler }) {
       const data = await reponse.json();
 
       if (data.status === "ok") {
-        onCreee(data.commande_id); // l'accueil reprend la main et affiche cette commande
+        setCommandeCreee(true); // affiche l'écran de confirmation à la place du formulaire
       } else {
         setErreur(data.message);
       }
@@ -73,8 +77,21 @@ export default function FormulaireCommande({ onCreee, onAnnuler }) {
     }
   };
 
+  if (commandeCreee) {
+    return (
+      <main className="creation-commande">
+        <EcranSucces
+          titre="Commande créée"
+          message={`La commande de « ${nomClient} » a bien été enregistrée.`}
+          libelleBouton="Retour à l'accueil"
+          onContinuer={() => navigate("/")}
+        />
+      </main>
+    );
+  }
+
   return (
-    <main className="app">
+    <main className="creation-commande">
     <header>
       <h1>Nouvelle commande</h1>
     </header>
@@ -92,7 +109,9 @@ export default function FormulaireCommande({ onCreee, onAnnuler }) {
         />
       </label>
 
-      <h2>Pièces</h2>
+      <label className="commande-lignes-label">
+        Pièces
+      </label>
       {lignes.map((ligne, index) => (
         <div key={index} className="commande-ligne">
           <select
@@ -118,24 +137,25 @@ export default function FormulaireCommande({ onCreee, onAnnuler }) {
           />
 
           {lignes.length > 1 && (
-            <button type="button" onClick={() => supprimerLigne(index)}>
+            <button type="button" className="btn btn--plein" onClick={() => supprimerLigne(index)}>
               Retirer
             </button>
           )}
         </div>
       ))}
 
-      <button type="button" onClick={ajouterLigne}>
-        + Ajouter une pièce
+      <button type="button" className="btn btn--plein" onClick={ajouterLigne}>
+        <IconePlus />
+        Ajouter une pièce
       </button>
 
       {erreur && <p role="alert">{erreur}</p>}
 
       <div className="commande-actions">
-        <button type="submit" disabled={envoiEnCours}>
+        <button type="submit" className="btn btn--plein" disabled={envoiEnCours}>
           {envoiEnCours ? "Création…" : "Créer la commande"}
         </button>
-        <button type="button" onClick={onAnnuler}>
+        <button type="button" className="btn btn--plein" onClick={() => navigate("/")}>
           Annuler
         </button>
       </div>
