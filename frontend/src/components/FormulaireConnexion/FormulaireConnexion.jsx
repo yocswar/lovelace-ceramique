@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FormulaireConnexion.css";
+import LogoPotterPilot from "../LogoPotterPilot/LogoPotterPilot.jsx";
 
 /**
  * Formulaire d'authentification.
@@ -101,59 +102,72 @@ function FormulaireConnexion() {
   }
 
   return (
-    <>
-      <form className="fc-form" onSubmit={handleSubmit} aria-labelledby={`${uid}-titre`}>
-        <h1 id={`${uid}-titre`} className="fc-titre">
-          Connexion
-        </h1>
-        <p className="fc-sous-titre">Accédez à votre espace avec votre compte.</p>
-
-        {erreur && (
-          <div id={idErreur} className="fc-erreur" role="alert">
-            {erreur}
-          </div>
-        )}
-
-        <div className="fc-champ">
-          <label htmlFor={idIdentifiant}>Identifiant</label>
-          <input
-            id={idIdentifiant}
-            type="text"
-            name="identifiant"
-            autoComplete="username"
-            inputMode="identifiant"
-            required
-            value={identifiant}
-            onChange={(e) => setIdentifiant(e.target.value)}
-            aria-invalid={erreur ? "true" : undefined}
-            aria-describedby={erreur ? idErreur : undefined}
-            disabled={chargement}
-          />
+    <main className="fc-page">
+      <div className="fc-fond">
+        <div className="fc-marque">
+          <LogoPotterPilot className="fc-logo" />
+          <h1 className="fc-nom-appli">PotterPilot</h1>
         </div>
+        <form className="fc-form" onSubmit={handleSubmit} aria-labelledby={`${uid}-titre`}>
+          <h1 id={`${uid}-titre`} className="fc-titre">
+            Connecte-toi à ton espace
+          </h1>
 
-        <div className="fc-champ">
-          <label htmlFor={idMdp}>Mot de passe</label>
-          <div className="fc-mdp">
+          {erreur && (
+            <div id={idErreur} className="fc-erreur" role="alert">
+              {erreur}
+            </div>
+          )}
+
+          <div className="fc-champ">
+            <label htmlFor={idIdentifiant}>Identifiant</label>
             <input
-              id={idMdp}
-              type="password"
-              name="motDePasse"
-              autoComplete="current-password"
+              id={idIdentifiant}
+              type="text"
+              name="identifiant"
+              autoComplete="username"
+              inputMode="identifiant"
               required
-              value={motDePasse}
-              onChange={(e) => setMotDePasse(e.target.value)}
+              value={identifiant}
+              onChange={(e) => setIdentifiant(e.target.value)}
               aria-invalid={erreur ? "true" : undefined}
               aria-describedby={erreur ? idErreur : undefined}
               disabled={chargement}
+              placeholder="Identifiant"
             />
           </div>
-        </div>
 
-        <button type="submit" className="fc-envoyer" disabled={chargement}>
-          {chargement ? "Connexion en cours…" : "Se connecter"}
-        </button>
-      </form>
-    </>
+          <div className="fc-champ">
+            <label htmlFor={idMdp}>Mot de passe</label>
+            <div className="fc-mdp">
+              <input
+                id={idMdp}
+                type="password"
+                name="motDePasse"
+                autoComplete="current-password"
+                required
+                value={motDePasse}
+                onChange={(e) => setMotDePasse(e.target.value)}
+                aria-invalid={erreur ? "true" : undefined}
+                aria-describedby={erreur ? idErreur : undefined}
+                disabled={chargement}
+                placeholder="Mot de passe"
+              />
+            </div>
+          </div>
+
+          <div className="fc-actions">
+            <button type="submit" className="btn btn--contour fc-envoyer" disabled={chargement}>
+              {chargement ? "Connexion en cours…" : "Se connecter"}
+            </button>
+            <button type="button" className="btn btn--contour" onClick={() => navigate("/creation-organisation")}>
+              Créer une organisation
+            </button>
+          </div>
+        </form>
+      </div>
+      
+    </main>
   );
 }
 

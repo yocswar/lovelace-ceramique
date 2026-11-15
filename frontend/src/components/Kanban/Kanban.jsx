@@ -81,8 +81,6 @@ function Kanban({ commandeId }) {
 
   return (
     <section className="kanban-section">
-      <h2>Commandes à faire</h2>
-
       {message && (
         <p role="status" className={`connection-message ${status}`}>
           {message}
