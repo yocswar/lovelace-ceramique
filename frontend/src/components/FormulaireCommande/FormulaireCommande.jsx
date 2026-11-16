@@ -1,6 +1,5 @@
 // FormulaireCommande.jsx : création d'une commande (nom du client + pièces à fabriquer)
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { getToken } from "../FormulaireConnexion/FormulaireConnexion";
 import "./FormulaireCommande.css";
 import IconePlus from "../IconePlus/IconePlus";
@@ -9,8 +8,9 @@ import EcranSucces from "../EcranSucces/EcranSucces";
 // Adapte si ton FormulaireConnexion utilise une URL de base différente (ex. variable d'environnement)
 const API = "/api";
 
-export default function FormulaireCommande() {
-  const navigate = useNavigate();
+// onCreee() : appelée par le bouton de l'écran de succès ; onAnnuler() : appelée par le bouton Annuler.
+// C'est Accueil qui referme le formulaire : plus de navigation, donc l'adresse reste « / ».
+export default function FormulaireCommande({ onCreee, onAnnuler }) {
   const [pieces, setPieces] = useState([]);
   const [nomClient, setNomClient] = useState("");
   const [lignes, setLignes] = useState([{ piece_id: "", quantite: 1 }]);
@@ -84,7 +84,7 @@ export default function FormulaireCommande() {
           titre="Commande créée"
           message={`La commande de « ${nomClient} » a bien été enregistrée.`}
           libelleBouton="Retour à l'accueil"
-          onContinuer={() => navigate("/")}
+          onContinuer={onCreee}
         />
       </main>
     );
@@ -155,7 +155,7 @@ export default function FormulaireCommande() {
         <button type="submit" className="btn btn--plein" disabled={envoiEnCours}>
           {envoiEnCours ? "Création…" : "Créer la commande"}
         </button>
-        <button type="button" className="btn btn--plein" onClick={() => navigate("/")}>
+        <button type="button" className="btn btn--plein" onClick={onAnnuler}>
           Annuler
         </button>
       </div>
