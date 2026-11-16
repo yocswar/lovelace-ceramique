@@ -27,6 +27,28 @@ final class CommandeController
         $this->view = new CommandeView();
     }
 
+    // GET /api/commandes
+    public function index(): void
+    {
+        $utilisateur = JwtAuth::utilisateurConnecte();
+        if ($utilisateur === null) {
+            $this->view->error(401, 'Authentification requise');
+            return;
+        }
+
+        try {
+            /** @var PDO $pdo */
+            $pdo = require __DIR__ . '/../config/db.php';
+
+            $commandeModel = new CommandeModel($pdo);
+
+            $this->view->retourCommandes($commandeModel->recupererCommandesEnCours());
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            $this->view->error((int) $e->getCode(), 'Erreur lors de la récupération des commandes');
+        }
+    }
+
     // POST /api/commandes
     public function creer(): void
     {

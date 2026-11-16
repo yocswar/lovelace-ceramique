@@ -87,6 +87,9 @@ switch ($path) {
     case '/api/commandes':
         $controller = new CommandeController();
         switch ($method) {
+            case 'GET':
+                $controller->index();
+                break;
             case 'POST':
                 $controller->creer();
                 break;
