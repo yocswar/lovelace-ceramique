@@ -49,7 +49,7 @@ function Commandes() {
                 <article  key={commande.id} className="commande-carte">
                     
                     <header className="commande-header">
-                        <h2> Commande n°{commande.id}</h2>
+                        <h2> Commande n°{commande.id} - {commande.nom_client} - {affichageStatut(commande.statut)}</h2>
                     </header>
 
                     <Kanban commandeId={commande.id}/>
@@ -58,6 +58,17 @@ function Commandes() {
         </section>
         </>
         );
+}
+
+function affichageStatut(statut) {
+    switch (statut) {
+        case "a_faire":
+            return "À faire"
+            break;
+        case "en_cours":
+            return "En cours"
+            break;
+    }
 }
 
 export default Commandes;
