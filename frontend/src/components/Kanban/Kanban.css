@@ -69,3 +69,24 @@
 .kanban-carte--en-cours {
   opacity: 0.5;
 }
+
+.kanban-artisan {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-fond {
+  position: fixed;
+  inset: 0;
+  background: #0008;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}

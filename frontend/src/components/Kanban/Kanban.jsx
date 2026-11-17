@@ -11,6 +11,19 @@ function Kanban({ commandeId }) {
   const [enCours, setEnCours] = useState(null); // carte en cours d'envoi au back
   const [ticketGlisse, setTicketGlisse] = useState(null); // carte en train d'être glissée
   const [colonneSurvolee, setColonneSurvolee] = useState(null); // colonne sous la souris pendant le glisser
+  const [ticketSelectionne, setTicketSelectionne] = useState(null);
+  const [utilisateurs, setUtilisateurs] = useState([]);
+  const [utilisateurSelectionne, setUtilisateurSelectionne] = useState("");
+
+  const chargerUtilisateurs = () => {
+    fetch("/api/utilisateurs", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      }
+    })
+      .then(response => response.json())
+      .then(data => setUtilisateurs(data.utilisateurs));
+  };
 
   // [commandeId] : on recharge si la commande change
   useEffect(() => {
@@ -75,6 +88,27 @@ function Kanban({ commandeId }) {
     setColonneSurvolee(null);
   }
 
+  async function assignerUtilisateur() {
+    const response = await fetch("/api/tickets/assignation", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        id: ticketSelectionne.id,
+        utilisateur_id: Number(utilisateurSelectionne)
+      })
+    });
+
+    if (response.ok) {
+      alert("Utilisateur assigné !");
+      window.location.reload();
+    } else {
+      alert("Erreur lors de l'assignation");
+    }
+  }
+
   if (loading) {
     return <p>Chargement de l&apos;atelier…</p>;
   }
@@ -131,13 +165,55 @@ function Kanban({ commandeId }) {
                   <p>
                     Commande n°{ticket.commande_id} · {ticket.nom_client}
                   </p>
-                  <p className="kanban-artisan">{ticket.artisan ?? "Non assignée"}</p>
+                  <button
+                    className="kanban-artisan"
+                    onClick={() => {
+                      setTicketSelectionne(ticket);
+                      setUtilisateurSelectionne("");
+                      chargerUtilisateurs();
+                    }}
+                  >
+                    {ticket.artisan ?? "Non assignée"}
+                  </button>
                 </article>
               ))}
             </div>
           );
         })}
       </div>
+      {ticketSelectionne && (
+        <div className="modal-fond">
+          <div className="modal">
+            <h3>Assigner un utilisateur</h3>
+
+            <p>Ticket : {ticketSelectionne.piece}</p>
+
+            <select
+              value={utilisateurSelectionne}
+              onChange={(e) => setUtilisateurSelectionne(e.target.value)}
+            >
+              <option value="">Choisir un utilisateur</option>
+
+              {utilisateurs.map(utilisateur => (
+                <option key={utilisateur.id} value={utilisateur.id}>
+                  {utilisateur.nom}
+                </option>
+              ))}
+            </select>
+
+            <button
+              disabled={!utilisateurSelectionne}
+              onClick={assignerUtilisateur}
+            >
+              Assigner
+            </button>
+
+            <button onClick={() => setTicketSelectionne(null)}>
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
