@@ -64,6 +64,11 @@ switch ($path) {
         }
         break;
 
+    case '/api/ajout/utilisateurs':
+        $controller = new UtilisateurController();
+        $controller->creerCollaborateur();
+        break;
+
     case '/api/utilisateurs':
         $controller = new UtilisateurController();
         switch ($method) {

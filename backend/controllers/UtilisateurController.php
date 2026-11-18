@@ -100,6 +100,19 @@ final class UtilisateurController
         }
     }
 
+    public function creerCollaborateur(): void
+{
+    header('Content-Type: application/json; charset=utf-8');
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Allow: POST');
+        $this->repondreErreur(405, 'Méthode non autorisée');
+        return;
+    }
+
+    $this->repondreErreur(501, 'Création du collaborateur non disponible');
+}
+
     /** @param list<string>|null $erreurs */
     private function repondreErreur(int $code, string $message, ?array $erreurs = null): void
     {

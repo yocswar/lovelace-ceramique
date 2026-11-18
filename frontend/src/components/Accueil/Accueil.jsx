@@ -2,6 +2,7 @@ import { useState } from "react";
 import InscriptionForm from "../InscriptionForm/InscriptionForm";
 import FormulaireConnexion from "../FormulaireConnexion/FormulaireConnexion";
 import Kanban from "../Kanban/Kanban";
+import AjoutUtilisateurForm from "../AjoutUtilisateurForm/AjoutUtilisateurForm";
 
 function Accueil() {
   const [message, setMessage] = useState("");
@@ -18,8 +19,8 @@ function Accueil() {
       const response = await fetch("/api/healthcheck", {
         method: "GET",
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
@@ -51,8 +52,8 @@ function Accueil() {
       const response = await fetch("/api/utilisateur", {
         method: "GET",
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
@@ -125,7 +126,8 @@ function Accueil() {
         )}
       </section>
       <Kanban commandeId={17} />
-      <InscriptionForm/>
+      <InscriptionForm />
+      <AjoutUtilisateurForm />
     </main>
   );
 }
