@@ -2,3 +2,6 @@
 .DS_Store
 vendor/
 *.log
+*.cache
+backend/.phpunit.result.cache
+.github/

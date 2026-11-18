@@ -4,8 +4,12 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../models/HealthcheckModel.php';
-require_once __DIR__ . '/../views/HealthcheckView.php';
+namespace App\Controllers;
+
+use App\Models\HealthcheckModel;
+use App\Views\HealthcheckView;
+use Throwable;
+
 
 final class HealthcheckController
 {

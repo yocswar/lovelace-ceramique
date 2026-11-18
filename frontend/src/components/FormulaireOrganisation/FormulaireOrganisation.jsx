@@ -1,5 +1,7 @@
 import { useState } from "react";
-import "./InscriptionForm.css";
+import { useNavigate } from "react-router-dom";
+import EcranSucces from "../EcranSucces/EcranSucces";
+import "./FormulaireOrganisation.css";
 
 const champsInitiaux = {
   organisation_nom: "",
@@ -9,7 +11,8 @@ const champsInitiaux = {
   mdp: "",
 };
 
-function InscriptionForm() {
+function FormulaireOrganisation() {
+  const navigate = useNavigate();
   const [champs, setChamps] = useState(champsInitiaux);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -55,10 +58,23 @@ function InscriptionForm() {
     }
   }
 
+  // Écran de confirmation : remplace le formulaire
+  if (status === "success") {
+    return (
+      <main className="inscription inscription-succes">
+        <EcranSucces
+          titre="Organisation créée"
+          message={message}
+          libelleBouton="Aller à la connexion"
+          onContinuer={() => navigate("/connexion")}
+        />
+      </main>
+    );
+  }
+
   return (
-    <section className="inscription">
-      <h2>Créer une organisation</h2>
-      <p>Créez votre organisation et le compte administrateur associé.</p>
+    <main className="inscription">
+      <h1>Créer une organisation</h1>
 
       <form onSubmit={soumettre}>
         <label>
@@ -126,13 +142,18 @@ function InscriptionForm() {
           />
         </label>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Création..." : "Créer le compte admin"}
-        </button>
+        <div className="inscription-boutons">
+          <button type="submit" className="btn btn--plein" disabled={loading}>
+            {loading ? "Création..." : "Créer le compte admin"}
+          </button>
+          <button className="btn btn--plein" type="button" onClick={() => navigate("/connexion")}>
+            Annuler
+          </button>
+        </div>
       </form>
 
-      {message && (
-        <p role="status" className={`connection-message ${status}`}>
+      {status === "error" && message && (
+        <p role="status" className="connection-message error">
           {message}
         </p>
       )}
@@ -144,8 +165,8 @@ function InscriptionForm() {
           ))}
         </ul>
       )}
-    </section>
+    </main>
   );
 }
 
-export default InscriptionForm;
+export default FormulaireOrganisation;

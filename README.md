@@ -2,6 +2,11 @@
 
 Application web SaaS destinée aux artisans potiers et céramistes — projet collectif Ada Tech School (CDA).
 
+<<<<<<< HEAD
+=======
+**Nom de l'application :** PotterPilot. « Lovelace Céramique » désigne actuellement le projet.
+
+>>>>>>> main
 ## 1. Contexte et objectifs
 
 L'application vise à faciliter le suivi de la production dans les petits ateliers de céramique : **façonnage → séchage → engobage/peinture → émaillage → cuisson → contrôle qualité**. Elle doit aider les artisans à connaître l'étape de chaque objet, les échéances (par exemple, 24 h de séchage), les tâches attribuées et les pertes (casse, fissure, craquelage), afin de respecter les délais.
@@ -21,10 +26,17 @@ Chaque matin, Claire, céramiste et fondatrice d'un atelier, perd du temps à re
 
 ## 2. Profils et droits envisagés
 
+<<<<<<< HEAD
 | Profil | Responsabilités prévues |
 | --- | --- |
 | **Admin** | Créer, supprimer et configurer les étapes, définir les échéances, déplacer les objets entre étapes, ajouter des membres et attribuer des rôles ; dispose également des droits de contribution. |
 | **Contributeur** | Créer et attribuer des tâches, les valider et faire progresser les objets dans le workflow, selon les droits retenus. |
+=======
+| Profil           | Responsabilités prévues                                                                                                                                                                        |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Admin**        | Créer, supprimer et configurer les étapes, définir les échéances, déplacer les objets entre étapes, ajouter des membres et attribuer des rôles ; dispose également des droits de contribution. |
+| **Contributeur** | Créer et attribuer des tâches, les valider et faire progresser les objets dans le workflow, selon les droits retenus.                                                                          |
+>>>>>>> main
 
 > La répartition exacte des permissions devra être précisée avant l'implémentation de l'authentification et de l'autorisation.
 
@@ -144,6 +156,7 @@ curl -i http://localhost:8080/api/healthcheck
 
 Une réponse `HTTP 200 OK` avec `"status":"ok"` confirme que PHP a pu exécuter `SELECT 1` dans PostgreSQL. **La racine `http://localhost:8080/` n'est plus la page HTML de test initiale.**
 
+<<<<<<< HEAD
 ### Étape 5 — Démarrer React
 
 Le service `frontend` est déjà démarré par `docker compose up -d --build`. Il exécute automatiquement `npm ci` puis Vite. Depuis la racine du dépôt, vérifier son état :
@@ -151,11 +164,37 @@ Le service `frontend` est déjà démarré par `docker compose up -d --build`. I
 ```bash
 docker compose ps
 docker compose logs --tail=30 frontend
+=======
+### Étape 5 — Générer l'autoloader php
+
+Dans ce projet, Composer est déjà disponible **dans le conteneur PHP** (pas besoin de l’installer sur ton Mac).
+
+Depuis la **racine du projet** (là où se trouve `docker-compose.yml`) :
+
+```bash
+docker compose exec php composer --version
+>>>>>>> main
 ```
 
-Ouvrir http://localhost:5173, puis cliquer sur **« Vérifier la connexion »**. Le message attendu est **« Connexion PostgreSQL OK »**.
+Tu dois voir un numéro de version (par exemple `Composer version 2.x...`).
 
+<<<<<<< HEAD
 `npm ci` utilise le fichier `package-lock.json` ; les dépendances sont conservées dans le volume Docker `frontend_node_modules`. Le répertoire `node_modules/` est ignoré par Git.
+=======
+> Si la commande échoue : vérifie que les conteneurs tournent (`docker compose ps`).
+
+S'il n'est pas installé :
+
+```bash
+docker compose exec php composer install
+```
+
+Si tout est installé, régénérer l'autoloader (à faire à chaque modification ou ajout de classe dans les namespaces) :
+
+```bash
+docker compose exec php composer dump-autoload
+```
+>>>>>>> main
 
 ### Étape 6 — Accéder à pgAdmin
 
@@ -179,6 +218,7 @@ Dans **Register → Server**, renseigner :
 
 **Important :** dans pgAdmin exécuté sous Docker, l'hôte est **`postgres`**, et non `localhost`. Les identifiants de PostgreSQL doivent correspondre aux valeurs effectives de `.env` et de la base initialisée.
 
+<<<<<<< HEAD
 ### Étape 7 — Vérifications frontend
 
 Depuis la racine du dépôt :
@@ -194,6 +234,12 @@ Le build crée `frontend/dist/` (ignoré par Git). Il **ne déploie pas** l'appl
 
 - **Tous les services (y compris React) :** depuis la racine du dépôt, `docker compose down`.
 - **Redémarrage :** `docker compose up -d`.
+=======
+### Arrêter et redémarrer
+
+- **Services Docker :** depuis la racine du dépôt, `docker compose down`.
+- **Redémarrage :** `docker compose up -d`, puis `npm run dev` depuis `frontend/`.
+>>>>>>> main
 
 Ne pas utiliser `docker compose down -v` pour un arrêt normal : l'option `-v` supprime les volumes Docker et peut entraîner une perte de données PostgreSQL.
 
@@ -270,12 +316,12 @@ Exemples : « Afficher le catalogue des pièces » → `feat/catalogue-pieces` ;
 
 ### Équipe
 
-- Goundoba D — rôle à préciser.
-- Esteban — rôle à préciser.
-- Maxence Fournier — rôle à préciser.
-- Victor — rôle à préciser.
-- Emmanuel — rôle à préciser.
-- Tom — rôle à préciser.
+- Goundoba D — Scrum master.
+- Esteban — Reviewer.
+- Maxence Fournier — Développeur.
+- Victor — Développeur.
+- Emmanuel — Développeur.
+- Tom — Chef de projet.
 
 ## 9. ADR — Décisions d'architecture
 

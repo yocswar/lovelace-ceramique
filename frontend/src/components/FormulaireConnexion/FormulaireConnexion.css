@@ -1,0 +1,146 @@
+/* ==========================================================================
+   FormulaireConnexion.css : mise en page propre à l'écran de connexion
+   Les couleurs, champs et boutons viennent de global.css
+   ========================================================================== */
+
+/* Page : centre la carte au milieu de l'écran */
+.fc-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espace-3);
+}
+
+/* Carte brune */
+.fc-form {
+  width: 100%;
+  max-width: 23.5rem; /* ≈ 378px dans la maquette */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espace-3);
+  padding: var(--espace-4) 2rem 2.25rem;
+  background-color: var(--couleur-principale);
+  color: var(--couleur-texte-clair);
+  border-radius: var(--rayon-carte);
+  margin-top: 60px;
+}
+
+/* Bloc marque : logo + nom de l'application */
+.fc-marque {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fc-logo {
+  display: block;
+  width: auto;
+  height: 280px;
+  color: var(--couleur-principale); /* beige clair : lisible sur le fond brun */
+}
+
+.fc-nom-appli {
+  font-family: var(--police-marque);
+  font-size: 3.75rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--couleur-principale);
+}
+
+/* Titre */
+.fc-titre {
+  font-size: var(--taille-titre);
+  font-weight: 400;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--couleur-texte-clair);
+}
+
+/* Sous-titre (masqué visuellement : absent de la maquette, conservé pour les lecteurs d'écran) */
+.fc-sous-titre {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+/* Message d'erreur */
+.fc-erreur {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--couleur-erreur-fond);
+  color: var(--couleur-erreur-texte);
+  border-radius: var(--rayon-champ);
+  font-size: var(--taille-petit);
+  line-height: 1.4;
+}
+
+/* Groupe label + champ */
+.fc-champ {
+  width: 100%;
+}
+
+/* Les labels restent dans le DOM (accessibilité) mais le placeholder joue
+   le rôle de libellé visuel, comme dans la maquette. */
+.fc-champ > label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.fc-mdp {
+  position: relative;
+  width: 100%;
+}
+
+/* Espace entre les deux champs (légèrement plus aéré que le gap de la carte) */
+.fc-champ + .fc-champ {
+  margin-top: 0.5rem;
+}
+
+/* Zone des boutons */
+.fc-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Bouton principal : hérite de .btn .btn--contour (global.css) */
+.fc-envoyer {
+  min-width: 10rem;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 30rem) {
+  .fc-page {
+    padding: var(--espace-2);
+  }
+
+  .fc-logo {
+    height: 5.5rem;
+  }
+
+  .fc-form {
+    padding: 2rem 1.25rem;
+    border-radius: 1.25rem;
+  }
+
+  .fc-actions,
+  .fc-actions .btn {
+    width: 100%;
+  }
+}

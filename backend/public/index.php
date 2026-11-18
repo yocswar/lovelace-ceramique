@@ -3,11 +3,17 @@
 declare(strict_types=1);
 
 // Chargement des contrôleurs
-require_once __DIR__ . '/../controllers/HomeController.php';
-require_once __DIR__ . '/../controllers/TestController.php';
-require_once __DIR__ . '/../controllers/ExampleController.php';
-require_once __DIR__ . '/../controllers/HealthcheckController.php';
-require_once __DIR__ . '/../controllers/UtilisateurController.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Controllers\HomeController;
+use App\Controllers\TestController;
+use App\Controllers\ExampleController;
+use App\Controllers\UtilisateurController;
+use App\Controllers\HealthcheckController;
+use App\Controllers\AuthController;
+use App\Controllers\TicketController;
+use App\Controllers\CommandeController;
+use App\Controllers\PieceController;
 
 // Récupérer la route demandée
 $method = $_SERVER['REQUEST_METHOD'];
@@ -30,10 +36,68 @@ switch ($path) {
         $controller->index();
         break;
 
-    // Vérifier la route
+    case '/api/connexion':
+        $controller = new AuthController();
+        $controller->connexion();
+        break;
+
     case '/api/healthcheck':
         $controller = new HealthcheckController();
         $controller->index();
+        break;
+
+    // US.14 : étapes + pièces des commandes actives, pour le Kanban de la page d'accueil
+    case '/api/tickets':
+        $controller = new TicketController();
+        switch ($method) {
+            case 'GET':
+                $controller->index();
+                break;
+            case 'PATCH':
+                $controller->changerEtape();;
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Méthode non autorisée'
+                ]);
+                break;
+        }
+        break;
+
+    // Création de commande : le catalogue de pièces alimente la liste déroulante du formulaire
+    case '/api/pieces':
+        $controller = new PieceController();
+        switch ($method) {
+            case 'GET':
+                $controller->index();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Méthode non autorisée'
+                ]);
+                break;
+        }
+        break;
+
+    // Création de commande : la commande + un ticket par pièce à fabriquer
+    case '/api/commandes':
+        $controller = new CommandeController();
+        switch ($method) {
+            case 'POST':
+                $controller->creer();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Méthode non autorisée'
+                ]);
+                break;
+        }
         break;
 
     case '/api/utilisateurs':
