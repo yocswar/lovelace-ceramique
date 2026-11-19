@@ -3,7 +3,9 @@ name: cd
 on:
   push:
     branches: main
-
+permissions:
+  contents: read
+  packages: write
 jobs:
   publish:
     runs-on: ubuntu-latest
