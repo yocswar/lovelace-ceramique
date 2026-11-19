@@ -113,14 +113,11 @@ final class TicketController
         }
 
             // Vérifier que l'assignation est autorisée
-            if (
-                $utilisateurId === null ||
-                !$ticketModel->verifierAssignation(
-                    $ticketId,
-                    $utilisateurId,
-                    (int) $connecte['sub']
-                )
-            ) {
+            if (!$ticketModel->verifierAssignation(
+                $ticketId,
+                $utilisateurId ?? (int) $connecte['sub'],
+                (int) $connecte['sub']
+            )) {
                 $this->view->error(403, 'Assignation non autorisée');
                 return;
             }

@@ -97,12 +97,19 @@ function Kanban({ commandeId }) {
       },
       body: JSON.stringify({
         id: ticketSelectionne.id,
-        utilisateur_id: Number(utilisateurSelectionne)
+        utilisateur_id: utilisateurSelectionne === "aucun"
+          ? null
+          : Number(utilisateurSelectionne)
       })
     });
 
     if (response.ok) {
-      alert("Utilisateur assigné !");
+      if (utilisateurSelectionne === "aucun") {
+        alert("Utilisateur désassigné !");
+      } else {
+        alert("Utilisateur assigné !");
+      }
+
       window.location.reload();
     } else {
       alert("Erreur lors de l'assignation");
@@ -193,6 +200,7 @@ function Kanban({ commandeId }) {
               onChange={(e) => setUtilisateurSelectionne(e.target.value)}
             >
               <option value="">Choisir un utilisateur</option>
+              <option value="aucun">Aucun utilisateur (désassigner)</option>
 
               {utilisateurs.map(utilisateur => (
                 <option key={utilisateur.id} value={utilisateur.id}>
