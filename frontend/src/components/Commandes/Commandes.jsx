@@ -9,6 +9,11 @@ function Commandes() {
     const [chargement, setChargement] = useState(true);
     const [message, setMessage] = useState("");
 
+    // Récupérer les informations de l'utilisateur connecté
+    const utilisateur = JSON.parse(
+        localStorage.getItem("utilisateur") || "null"
+    );
+
     const entetes = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${getToken()}`,
@@ -17,7 +22,10 @@ function Commandes() {
     useEffect(() => {
         async function chargerCommande() {
             try {
-                const response = await fetch("/api/commandes", {
+                if(!utilisateur) {
+                    throw new Error("Erreur lors de la récupération des informations de l'utilisateur");
+                }
+                const response = await fetch("/api/commandes?id=" + utilisateur.organisation_id, {
                     method: "GET",
                     headers: entetes
                 });
