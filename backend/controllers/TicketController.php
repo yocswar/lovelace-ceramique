@@ -78,4 +78,27 @@ final class TicketController
             $this->view->error(500, 'Impossible de changer l\'étape');
         }
     }
+
+        // US.13 : après une perte, l'artisan peut relancer la même pièce depuis le début
+    public function recreer(): void
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $ticketPerduId = (int) ($data['ticket_id'] ?? 0);
+
+        try {
+            /** @var PDO $pdo */
+            $pdo = require __DIR__ . '/../config/db.php';
+            $nouvelId = (new TicketModel($pdo))->recreer($ticketPerduId);
+
+            if ($nouvelId === null) {
+                $this->view->error(404, 'Ticket introuvable');
+                return;
+            }
+
+            $this->view->ticketRecree($nouvelId);
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            $this->view->error(500, 'Impossible de recréer la pièce');
+        }
+    }
 }

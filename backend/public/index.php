@@ -54,7 +54,10 @@ switch ($path) {
                 $controller->index();
                 break;
             case 'PATCH':
-                $controller->changerEtape();;
+                $controller->changerEtape();
+                break;
+            case 'POST' :
+                $controller->recreer();
                 break;
             default:
                 http_response_code(405);
