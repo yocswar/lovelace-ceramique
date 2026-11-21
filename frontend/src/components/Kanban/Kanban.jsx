@@ -11,6 +11,7 @@ function Kanban({ commandeId }) {
   const [enCours, setEnCours] = useState(null); // carte en cours d'envoi au back
   const [ticketGlisse, setTicketGlisse] = useState(null); // carte en train d'être glissée
   const [colonneSurvolee, setColonneSurvolee] = useState(null); // colonne sous la souris pendant le glisser
+  const [ticketPerdu, setTicketPerdu] = useState(null); // carte qui vient d'arriver en Perte : ouvre la modal
 
   // [commandeId] : on recharge si la commande change
   useEffect(() => {
@@ -62,11 +63,42 @@ function Kanban({ commandeId }) {
       );
       setMessage(data.message);
       setStatus("success");
+      // US.13 : on se fie à la réponse du back, qui connaît le vrai nom de l'étape
+      if (data.etape.nom === "Perte") {
+        setTicketPerdu(tickets.find((ticket) => ticket.id === ticketId));
+      }
     } catch (error) {
       setMessage(error.message);
       setStatus("error");
     } finally {
       setEnCours(null);
+    }
+  }
+
+    async function recreerPiece() {
+    try {
+      const response = await fetch("/api/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ticket_id: ticketPerdu.id }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Recréation impossible");
+      }
+
+      // Copie locale de la carte perdue : pas besoin de recharger tout le Kanban.
+      // etapes[0] = "À faire", car le back renvoie les étapes triées par ordre.
+      const nouvelleCarte = { ...ticketPerdu, id: data.ticket_id, etape_id: etapes[0].id, artisan: null };
+      setTickets((prev) => [...prev, nouvelleCarte]);
+      setMessage(data.message);
+      setStatus("success");
+    } catch (error) {
+      setMessage(error.message);
+      setStatus("error");
+    } finally {
+      setTicketPerdu(null);
     }
   }
 
@@ -85,6 +117,18 @@ function Kanban({ commandeId }) {
         <p role="status" className={`connection-message ${status}`}>
           {message}
         </p>
+      )}
+
+      {ticketPerdu && (
+        <div className="modal-fond">
+          <div className="modal" role="dialog" aria-modal="true">
+            <p>
+              " {ticketPerdu.piece} " est perdue. Recréer la pièce dans "À faire" ?
+            </p>
+            <button onClick={recreerPiece}>Oui, recréer</button>
+            <button onClick={() => setTicketPerdu(null)}>Non</button>
+          </div>
+        </div>
       )}
 
       <div className="kanban">

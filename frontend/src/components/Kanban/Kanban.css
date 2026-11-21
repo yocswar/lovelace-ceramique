@@ -69,3 +69,22 @@
 .kanban-carte--en-cours {
   opacity: 0.5;
 }
+
+/* position: fixed : le voile reste en place même si on fait défiler le Kanban */
+.modal-fond { 
+  position: fixed; 
+  inset: 0; 
+  background: rgba(0, 0, 0, 0.4); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+}
+
+.modal { 
+  background: #fff; 
+  padding: 1.5rem; 
+  border-radius: 8px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.75rem; 
+  max-width: 22rem; }
