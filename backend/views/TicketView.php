@@ -24,6 +24,16 @@ final class TicketView
         ]);
     }
 
+        // US.13 : 201 = une ressource a été créée ; React utilise l'id pour recharger le Kanban
+    public function ticketRecree(int $nouvelId): void
+    {
+        $this->send(201, [
+            'status' => 'ok',
+            'message' => 'Nouvelle pièce créée dans À faire',
+            'ticket_id' => $nouvelId,
+        ]);
+    }
+
     // Toutes les erreurs passent par ici, avec un message lisible (jamais le détail technique)
     public function error(int $code, string $message): void
     {
