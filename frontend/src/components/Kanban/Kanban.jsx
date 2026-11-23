@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Toast from "../Toast/Toast";
 import "./Kanban.css";
 
 // Kanban d'une commande (US.14). On glisse une carte dans n'importe quelle colonne pour changer son étape (US.12).
@@ -12,30 +13,49 @@ function Kanban({ commandeId }) {
   const [ticketGlisse, setTicketGlisse] = useState(null); // carte en train d'être glissée
   const [colonneSurvolee, setColonneSurvolee] = useState(null); // colonne sous la souris pendant le glisser
   const [ticketPerdu, setTicketPerdu] = useState(null); // carte qui vient d'arriver en Perte : ouvre la modal
+  const [ticketSelectionne, setTicketSelectionne] = useState(null);
+  const [utilisateurs, setUtilisateurs] = useState([]);
+  const [utilisateurSelectionne, setUtilisateurSelectionne] = useState("");
+  const [toast, setToast] = useState(null);
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000); // disparaît après 3 s
+  };
+
+  const chargerUtilisateurs = () => {
+    fetch("/api/utilisateurs", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      }
+    })
+    .then(response => response.json())
+    .then(data => setUtilisateurs(data.utilisateurs));
+  };
+
+  const chargerKanban = useCallback(async () => {
+    try {
+      const response = await fetch("/api/tickets?id=" + commandeId);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Chargement impossible");
+      }
+
+      setEtapes(data.etapes);
+      setTickets(data.tickets);
+    } catch (error) {
+      setMessage(error.message);
+      setStatus("error");
+    } finally {
+      setLoading(false);
+    }
+  }, [commandeId]);
 
   // [commandeId] : on recharge si la commande change
   useEffect(() => {
-    async function chargerKanban() {
-      try {
-        const response = await fetch("/api/tickets?id=" + commandeId);
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Chargement impossible");
-        }
-
-        setEtapes(data.etapes);
-        setTickets(data.tickets);
-      } catch (error) {
-        setMessage(error.message);
-        setStatus("error");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     chargerKanban();
-  }, [commandeId]);
+  }, [chargerKanban])
 
   async function changerEtape(ticketId, etapeId) {
     setEnCours(ticketId);
@@ -107,6 +127,33 @@ function Kanban({ commandeId }) {
     setColonneSurvolee(null);
   }
 
+  async function assignerUtilisateur() {
+    const response = await fetch("/api/tickets/assignation", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        id: ticketSelectionne.id,
+        utilisateur_id: utilisateurSelectionne === "aucun"
+          ? null
+          : Number(utilisateurSelectionne)
+      })
+    });
+
+    if (response.ok) {
+      showToast(
+        "success",
+        utilisateurSelectionne === "aucun" ? "Utilisateur désassigné !" : "Utilisateur assigné !"
+      );
+      chargerKanban(); // Recharge les tickets
+      setTicketSelectionne(null);
+    } else {
+      showToast("error", "Erreur lors de l'assignation");
+    }
+  }
+
   if (loading) {
     return <p>Chargement de l&apos;atelier…</p>;
   }
@@ -175,14 +222,58 @@ function Kanban({ commandeId }) {
                   <p>
                     Commande n°{ticket.commande_id} · {ticket.nom_client}
                   </p>
-                  <p className="kanban-artisan">{ticket.artisan ?? "Non assignée"}</p>
+                  <button
+                    className="kanban-artisan"
+                    onClick={() => {
+                      setTicketSelectionne(ticket);
+                      setUtilisateurSelectionne("");
+                      chargerUtilisateurs();
+                    }}
+                  >
+                    {ticket.artisan ?? "Non assignée"}
+                  </button>
                 </article>
               ))}
             </div>
           );
         })}
       </div>
-    </section>
+      {ticketSelectionne && (
+        <div className="modal-fond">
+          <div className="modal">
+            <h3>Assigner un utilisateur</h3>
+
+            <p>Ticket : {ticketSelectionne.piece}</p>
+
+            <select
+              value={utilisateurSelectionne}
+              onChange={(e) => setUtilisateurSelectionne(e.target.value)}
+            >
+              <option value="">Choisir un utilisateur</option>
+              <option value="aucun">Aucun utilisateur (désassigner)</option>
+
+              {utilisateurs.map(utilisateur => (
+                <option key={utilisateur.id} value={utilisateur.id}>
+                  {utilisateur.nom}
+                </option>
+              ))}
+            </select>
+
+            <button
+              disabled={!utilisateurSelectionne}
+              onClick={assignerUtilisateur}
+            >
+              Assigner
+            </button>
+
+            <button onClick={() => setTicketSelectionne(null)}>
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
+      {toast && <Toast type={toast.type} message={toast.message} />}
+    </section> 
   );
 }
 

@@ -56,7 +56,7 @@ switch ($path) {
             case 'PATCH':
                 $controller->changerEtape();
                 break;
-            case 'POST' :
+            case 'POST':
                 $controller->recreer();
                 break;
             default:
@@ -67,6 +67,18 @@ switch ($path) {
                 ]);
                 break;
         }
+        break;
+
+    case '/api/tickets/assignation':
+        $controller = new TicketController();
+
+        if ($method === 'PATCH') {
+            $controller->assignerUtilisateur();
+        } else {
+            http_response_code(405);
+            echo json_encode(['message' => 'Méthode non autorisée']);
+        }
+
         break;
 
     // Création de commande : le catalogue de pièces alimente la liste déroulante du formulaire
@@ -110,7 +122,7 @@ switch ($path) {
         $controller = new UtilisateurController();
         switch ($method) {
             case 'GET':
-                // $controller->get();
+                $controller->lister();
                 break;
             case 'POST':
                 $controller->creer();

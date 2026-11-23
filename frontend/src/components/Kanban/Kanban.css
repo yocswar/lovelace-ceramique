@@ -70,21 +70,53 @@
   opacity: 0.5;
 }
 
-/* position: fixed : le voile reste en place même si on fait défiler le Kanban */
-.modal-fond { 
-  position: fixed; 
-  inset: 0; 
-  background: rgba(0, 0, 0, 0.4); 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
+.kanban-artisan {
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-.modal { 
-  background: #fff; 
-  padding: 1.5rem; 
-  border-radius: 8px; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 0.75rem; 
-  max-width: 22rem; }
+.modal-fond {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fffaf5;
+  padding: 30px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  color: var(--couleur-principale);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal button {
+  width: auto;
+  min-width: 0;
+  height: auto;
+  min-height: 0;
+  align-self: center;
+  padding: 6px 15px;
+  font-size: 14px;
+  border-radius: 8px;
+  background: #984515;
+  color: white;
+  border: 1px solid #984515;
+  box-shadow: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.modal button:hover {
+  background: #74330f;
+}
