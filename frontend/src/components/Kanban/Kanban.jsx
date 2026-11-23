@@ -45,8 +45,7 @@ function Kanban({ commandeId }) {
       setEtapes(data.etapes);
       setTickets(data.tickets);
     } catch (error) {
-      setMessage(error.message);
-      setStatus("error");
+      showToast("error",error.message);
     } finally {
       setLoading(false);
     }
@@ -59,7 +58,6 @@ function Kanban({ commandeId }) {
 
   async function changerEtape(ticketId, etapeId) {
     setEnCours(ticketId);
-    setMessage("");
 
     try {
       const response = await fetch(`/api/tickets`, {
@@ -81,15 +79,13 @@ function Kanban({ commandeId }) {
           ticket.id === ticketId ? { ...ticket, etape_id: data.etape.id } : ticket,
         ),
       );
-      setMessage(data.message);
-      setStatus("success");
+      showToast("success",data.message);
       // US.13 : on se fie à la réponse du back, qui connaît le vrai nom de l'étape
       if (data.etape.nom === "Perte") {
         setTicketPerdu(tickets.find((ticket) => ticket.id === ticketId));
       }
     } catch (error) {
-      setMessage(error.message);
-      setStatus("error");
+      showToast("error",error.message);
     } finally {
       setEnCours(null);
     }
@@ -112,11 +108,9 @@ function Kanban({ commandeId }) {
       // etapes[0] = "À faire", car le back renvoie les étapes triées par ordre.
       const nouvelleCarte = { ...ticketPerdu, id: data.ticket_id, etape_id: etapes[0].id, artisan: null };
       setTickets((prev) => [...prev, nouvelleCarte]);
-      setMessage(data.message);
-      setStatus("success");
+      showToast("success",data.message);
     } catch (error) {
-      setMessage(error.message);
-      setStatus("error");
+      showToast("error",error.message);
     } finally {
       setTicketPerdu(null);
     }
@@ -148,7 +142,7 @@ function Kanban({ commandeId }) {
         utilisateurSelectionne === "aucun" ? "Utilisateur désassigné !" : "Utilisateur assigné !"
       );
       chargerKanban(); // Recharge les tickets
-      setTicketSelectionne(null);
+      setTicketSelectionne(null); // Sort de la modal
     } else {
       showToast("error", "Erreur lors de l'assignation");
     }
