@@ -6,14 +6,14 @@ namespace App\Models;
 
 use PDO;
 
-// Accès à la table utilisateur (requêtes SQL uniquement).
+// Accès à la table utilisateur (requêtes SQL uniquement)
 final class UtilisateurModel
 {
     public function __construct(
         private PDO $pdo,
     ) {}
 
-    // Crée un utilisateur et renvoie son id.
+    // Crée un utilisateur et renvoie son id
     public function creer(
         string $identifiant,
         string $mdpHash,
