@@ -54,4 +54,44 @@ final class TicketModel
         $stmt = $this->pdo->prepare('UPDATE commande_ticket SET etape_id = :etape_id WHERE id = :id');
         $stmt->execute(['etape_id' => $etapeId, 'id' => $ticketId]);
     }
+
+    public function assignerUtilisateur(int $ticketId, ?int $utilisateurId): void
+    {
+        $stmt = $this->pdo->prepare(
+            "UPDATE commande_ticket
+            SET utilisateur_id = :utilisateur_id
+            WHERE id = :id"
+        );
+
+        $stmt->execute([
+            'utilisateur_id' => $utilisateurId,
+            'id' => $ticketId
+        ]);
+    }
+
+    public function verifierAssignation(
+    int $ticketId,
+    int $utilisateurId,
+    int $connecteId
+    ): bool {
+        $sql = "SELECT 1
+                FROM commande_ticket t
+                JOIN commande c ON c.id = t.commande_id
+                JOIN utilisateur createur ON createur.id = c.utilisateur_id
+                JOIN utilisateur cible ON cible.id = :utilisateur_id
+                JOIN utilisateur connecte ON connecte.id = :connecte_id
+                WHERE t.id = :ticket_id
+                AND createur.organisation_id = connecte.organisation_id
+                AND cible.organisation_id = connecte.organisation_id";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            'ticket_id' => $ticketId,
+            'utilisateur_id' => $utilisateurId,
+            'connecte_id' => $connecteId
+        ]);
+
+        return $stmt->fetchColumn() !== false;
+    }
 }
