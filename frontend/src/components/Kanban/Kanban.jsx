@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Toast from "../Toast/Toast";
 import "./Kanban.css";
 
 // Kanban d'une commande (US.14). On glisse une carte dans n'importe quelle colonne pour changer son étape (US.12).
@@ -14,6 +15,12 @@ function Kanban({ commandeId }) {
   const [ticketSelectionne, setTicketSelectionne] = useState(null);
   const [utilisateurs, setUtilisateurs] = useState([]);
   const [utilisateurSelectionne, setUtilisateurSelectionne] = useState("");
+  const [toast, setToast] = useState(null);
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000); // disparaît après 3 s
+  };
 
   const chargerUtilisateurs = () => {
     fetch("/api/utilisateurs", {
@@ -21,33 +28,33 @@ function Kanban({ commandeId }) {
         Authorization: "Bearer " + localStorage.getItem("token")
       }
     })
-      .then(response => response.json())
-      .then(data => setUtilisateurs(data.utilisateurs));
+    .then(response => response.json())
+    .then(data => setUtilisateurs(data.utilisateurs));
   };
+
+  const chargerKanban = useCallback(async () => {
+    try {
+      const response = await fetch("/api/tickets?id=" + commandeId);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Chargement impossible");
+      }
+
+      setEtapes(data.etapes);
+      setTickets(data.tickets);
+    } catch (error) {
+      setMessage(error.message);
+      setStatus("error");
+    } finally {
+      setLoading(false);
+    }
+  }, [commandeId]);
 
   // [commandeId] : on recharge si la commande change
   useEffect(() => {
-    async function chargerKanban() {
-      try {
-        const response = await fetch("/api/tickets?id=" + commandeId);
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Chargement impossible");
-        }
-
-        setEtapes(data.etapes);
-        setTickets(data.tickets);
-      } catch (error) {
-        setMessage(error.message);
-        setStatus("error");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     chargerKanban();
-  }, [commandeId]);
+  }, [chargerKanban])
 
   async function changerEtape(ticketId, etapeId) {
     setEnCours(ticketId);
@@ -104,15 +111,14 @@ function Kanban({ commandeId }) {
     });
 
     if (response.ok) {
-      if (utilisateurSelectionne === "aucun") {
-        alert("Utilisateur désassigné !");
-      } else {
-        alert("Utilisateur assigné !");
-      }
-
-      window.location.reload();
+      showToast(
+        "success",
+        utilisateurSelectionne === "aucun" ? "Utilisateur désassigné !" : "Utilisateur assigné !"
+      );
+      chargerKanban(); // Recharge les tickets
+      setTicketSelectionne(null);
     } else {
-      alert("Erreur lors de l'assignation");
+      showToast("error", "Erreur lors de l'assignation");
     }
   }
 
@@ -222,7 +228,8 @@ function Kanban({ commandeId }) {
           </div>
         </div>
       )}
-    </section>
+      {toast && <Toast type={toast.type} message={toast.message} />}
+    </section> 
   );
 }
 
