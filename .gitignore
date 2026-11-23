@@ -4,4 +4,3 @@ vendor/
 *.log
 *.cache
 backend/.phpunit.result.cache
-.github/
