@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Models\OrganisationModel;
 use App\Models\UtilisateurModel;
 use App\Services\UtilisateurValidator;
+use App\Services\JwtAuth;
 use PDO;
 use Throwable;
 
@@ -100,7 +101,7 @@ final class UtilisateurController
         }
     }
 
-    public function creerCollaborateur(): void
+public function creerCollaborateur(): void
 {
     header('Content-Type: application/json; charset=utf-8');
 
@@ -110,7 +111,43 @@ final class UtilisateurController
         return;
     }
 
-    $this->repondreErreur(501, 'Création du collaborateur non disponible');
+    $claims = JwtAuth::utilisateurConnecte();
+
+    if ($claims === null) {
+        $this->repondreErreur(401, 'Authentification requise');
+        return;
+    }
+
+    $utilisateurId = $claims['sub'] ?? null;
+
+    if (!is_int($utilisateurId) || $utilisateurId <= 0) {
+        $this->repondreErreur(401, 'Jeton invalide');
+        return;
+    }
+
+    try {
+        $pdo = require __DIR__ . '/../config/db.php';
+        $utilisateurModel = new UtilisateurModel($pdo);
+        $utilisateur = $utilisateurModel->trouverParId($utilisateurId);
+
+        if ($utilisateur === null) {
+            $this->repondreErreur(401, 'Compte introuvable');
+            return;
+        }
+
+        if ($utilisateur['role'] !== 'Administrateur') {
+            $this->repondreErreur(403, 'Accès réservé aux administrateurs');
+            return;
+        }
+
+        $this->repondreErreur(
+            501,
+            'Création du collaborateur non disponible'
+        );
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        $this->repondreErreur(500, 'Impossible de vérifier les droits');
+    }
 }
 
     /** @param list<string>|null $erreurs */

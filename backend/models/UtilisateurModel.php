@@ -24,8 +24,8 @@ final class UtilisateurModel
     ): int {
         $stmt = $this->pdo->prepare(
             'INSERT INTO utilisateur (identifiant, mdp, email, nom, organisation_id, role)
-             VALUES (:identifiant, :mdp, :email, :nom, :organisation_id, :role)
-             RETURNING id'
+            VALUES (:identifiant, :mdp, :email, :nom, :organisation_id, :role)
+            RETURNING id'
         );
         $stmt->execute([
             'identifiant' => $identifiant,
@@ -68,6 +68,24 @@ final class UtilisateurModel
             LIMIT 1'
         );
         $stmt->execute(['identifiant' => $identifiant]);
+
+        $ligne = $stmt->fetch();
+
+        if ($ligne === false) {
+            return null;
+        }
+
+        return $ligne;
+    }
+
+    public function trouverParId(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id, role, organisation_id
+            FROM utilisateur
+            WHERE id = :id'
+        );
+        $stmt->execute(['id' => $id]);
 
         $ligne = $stmt->fetch();
 
