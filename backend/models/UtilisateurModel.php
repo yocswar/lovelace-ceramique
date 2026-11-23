@@ -95,4 +95,19 @@ final class UtilisateurModel
 
         return $ligne;
     }
+    // Liste les utilisateurs de la même organisation que le compte connecté.
+    public function listerPourUtilisateur(int $idConnecte): array
+    {
+        $sql = "SELECT u.id, u.nom
+                FROM utilisateur u
+                JOIN utilisateur connecte
+                    ON u.organisation_id = connecte.organisation_id
+                WHERE connecte.id = :id
+                ORDER BY u.nom";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $idConnecte]);
+
+        return $stmt->fetchAll();
+    }
 }
