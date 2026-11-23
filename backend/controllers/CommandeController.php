@@ -36,13 +36,20 @@ final class CommandeController
             return;
         }
 
+        $id = (int) ($_GET['id'] ?? 0);
+
+        if ($id == 0) {
+            $this->view->error(400, "ID d'organisation nul ou invalide");
+            return;
+        }
+
         try {
             /** @var PDO $pdo */
             $pdo = require __DIR__ . '/../config/db.php';
 
             $commandeModel = new CommandeModel($pdo);
 
-            $this->view->retourCommandes($commandeModel->recupererCommandesEnCours());
+            $this->view->retourCommandes($commandeModel->recupererCommandesEnCours($id));
         } catch (Throwable $e) {
             error_log($e->getMessage());
             $this->view->error((int) $e->getCode(), 'Erreur lors de la récupération des commandes');
