@@ -12,6 +12,13 @@ function Accueil() {
   const [status, setStatus] = useState("");
   const [utilisateur, setUtilisateur] = useState([]);
 
+  // Récupère le compte enregistré lors de la connexion.
+  const utilisateurConnecte = JSON.parse(
+    localStorage.getItem("utilisateur") || "null",
+  );
+
+  const estAdministrateur = utilisateurConnecte?.role === "Administrateur";
+
   async function verifierConnexion() {
     setLoading(true);
     setMessage("");
@@ -92,7 +99,7 @@ function Accueil() {
         </button>
       </section>
       <Commandes />
-      <AjoutUtilisateurForm />
+      {estAdministrateur && <AjoutUtilisateurForm />}
     </main>
   );
 }
