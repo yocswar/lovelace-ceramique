@@ -37,22 +37,20 @@ function Header() {
 
         <nav className="header_nav" aria-label="Navigation principale">
           {estAdministrateur && (
-            <>
-              <Link to="/tableau-de-bord" className="btn btn--contour">
-                Tableau de bord
-              </Link>
+            <details className="header_admin">
+              <summary className="btn btn--contour">Administration</summary>
 
-              {/* Regroupe les actions réservées aux administrateurs. */}
-              <details className="header_admin">
-                <summary className="btn btn--contour">Administration</summary>
+              {/* Regroupe les pages et les actions d'administration. */}
+              <div className="header_admin-menu">
+                <Link to="/tableau-de-bord" onClick={fermerMenu}>
+                  Tableau de bord
+                </Link>
 
-                <div className="header_admin-menu">
-                  <Link to="/ajout-utilisateur" onClick={fermerMenu}>
-                    Ajouter un utilisateur
-                  </Link>
-                </div>
-              </details>
-            </>
+                <Link to="/ajout-utilisateur" onClick={fermerMenu}>
+                  Ajouter un collaborateur
+                </Link>
+              </div>
+            </details>
           )}
 
           <span className="header_separator" aria-hidden="true"></span>
