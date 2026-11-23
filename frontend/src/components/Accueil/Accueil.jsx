@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Commandes from "../Commandes/Commandes";
 import "./Accueil.css";
 import IconePlus from "../IconePlus/IconePlus";
-import AjoutUtilisateurForm from "../AjoutUtilisateurForm/AjoutUtilisateurForm";
 
 function Accueil() {
   const navigate = useNavigate();
@@ -11,13 +10,6 @@ function Accueil() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [utilisateur, setUtilisateur] = useState([]);
-
-  // Récupère le compte enregistré lors de la connexion.
-  const utilisateurConnecte = JSON.parse(
-    localStorage.getItem("utilisateur") || "null",
-  );
-
-  const estAdministrateur = utilisateurConnecte?.role === "Administrateur";
 
   async function verifierConnexion() {
     setLoading(true);
@@ -99,7 +91,6 @@ function Accueil() {
         </button>
       </section>
       <Commandes />
-      {estAdministrateur && <AjoutUtilisateurForm />}
     </main>
   );
 }
