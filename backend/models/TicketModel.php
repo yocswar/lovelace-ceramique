@@ -70,9 +70,9 @@ final class TicketModel
     }
 
     public function verifierAssignation(
-    int $ticketId,
-    int $utilisateurId,
-    int $connecteId
+        int $ticketId,
+        int $utilisateurId,
+        int $connecteId
     ): bool {
         $sql = "SELECT 1
                 FROM commande_ticket t
@@ -93,5 +93,23 @@ final class TicketModel
         ]);
 
         return $stmt->fetchColumn() !== false;
+    }
+
+    // US.13 : recrée la pièce perdue (même pièce, même commande) dans la première étape.
+    // L'artisan n'est pas copié : la nouvelle pièce repart sans personne assignée.
+    public function recreer(int $ticketPerduId): ?int
+    {
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO commande_ticket (piece_id, commande_id, etape_id)
+             SELECT piece_id, commande_id,
+                    (SELECT id FROM etape ORDER BY ordre LIMIT 1)
+             FROM commande_ticket
+             WHERE id = :id
+             RETURNING id'
+        );
+        $stmt->execute(['id' => $ticketPerduId]);
+        $nouvelId = $stmt->fetchColumn();
+
+        return $nouvelId === false ? null : (int) $nouvelId;
     }
 }

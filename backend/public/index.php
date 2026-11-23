@@ -56,6 +56,9 @@ switch ($path) {
             case 'PATCH':
                 $controller->changerEtape();
                 break;
+            case 'POST':
+                $controller->recreer();
+                break;
             default:
                 http_response_code(405);
                 echo json_encode([
@@ -66,15 +69,15 @@ switch ($path) {
         }
         break;
 
-        case '/api/tickets/assignation':
-            $controller = new TicketController();
+    case '/api/tickets/assignation':
+        $controller = new TicketController();
 
-            if ($method === 'PATCH') {
-                $controller->assignerUtilisateur();
-            } else {
-                http_response_code(405);
-                echo json_encode(['message' => 'Méthode non autorisée']);
-            }
+        if ($method === 'PATCH') {
+            $controller->assignerUtilisateur();
+        } else {
+            http_response_code(405);
+            echo json_encode(['message' => 'Méthode non autorisée']);
+        }
 
         break;
 
