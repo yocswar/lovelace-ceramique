@@ -55,7 +55,7 @@ function Commandes() {
 
             {commandes.map((commande) => (
                 <article  key={commande.id} className="commande-carte">
-                    
+
                     <header className="commande-header">
                         <h2> Commande n°{commande.id} - {commande.nom_client} - {affichageStatut(commande.statut)}</h2>
                     </header>

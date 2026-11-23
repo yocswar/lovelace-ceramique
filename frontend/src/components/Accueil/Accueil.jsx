@@ -20,8 +20,8 @@ function Accueil() {
       const response = await fetch("/api/healthcheck", {
         method: "GET",
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
@@ -53,8 +53,8 @@ function Accueil() {
       const response = await fetch("/api/utilisateur", {
         method: "GET",
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
@@ -81,12 +81,16 @@ function Accueil() {
   return (
     <main className="app">
       <section className="accueil-section">
-        <button type="button" className="btn btn--plein" onClick={() => navigate("/creation-commande")}>
+        <button
+          type="button"
+          className="btn btn--plein"
+          onClick={() => navigate("/creation-commande")}
+        >
           <IconePlus />
           Nouvelle commande
         </button>
       </section>
-      <Commandes/>
+      <Commandes />
     </main>
   );
 }

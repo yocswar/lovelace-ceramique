@@ -229,7 +229,7 @@ function Kanban({ commandeId }) {
         </div>
       )}
       {toast && <Toast type={toast.type} message={toast.message} />}
-    </section> 
+    </section>
   );
 }
 

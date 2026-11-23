@@ -1,0 +1,70 @@
+/* Présentation du formulaire de création d'un collaborateur. */
+.ajout-utilisateur {
+  display: grid;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 36rem;
+  margin: 2rem auto;
+  padding: clamp(1rem, 4vw, 2rem);
+  background: var(--couleur-surface, #fff);
+  border-radius: 1rem;
+}
+
+.ajout-utilisateur h2 {
+  margin: 0;
+}
+
+.ajout-utilisateur label {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+  font-weight: 500;
+}
+
+.ajout-utilisateur input[name],
+.ajout-utilisateur select[name] {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: var(--couleur-surface, #fff);
+  border: 1px solid var(--couleur-principale, #974315);
+  border-radius: 0.5rem;
+}
+
+.ajout-utilisateur input:focus-visible,
+.ajout-utilisateur select:focus-visible {
+  outline: 2px solid var(--couleur-principale, #974315);
+  outline-offset: 2px;
+}
+
+.ajout-utilisateur button {
+  width: 100%;
+}
+
+.ajout-utilisateur button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+/* Messages visibles après l'envoi du formulaire. */
+.ajout-utilisateur__succes,
+.ajout-utilisateur__erreur {
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid;
+  border-radius: 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.ajout-utilisateur__succes {
+  color: #205c32;
+  background: #edf7ef;
+}
+
+.ajout-utilisateur__erreur {
+  color: #7a1f0b;
+  background: #fdece4;
+}

@@ -1,91 +1,142 @@
 /* HEADER POTTERPILOT */
 .pp-header {
-    width: 100%;
-    min-height: 77px;
-    margin: 0;
-    gap: 20px;
-    background-color: var(--couleur-principale);
-    color: var(--couleur-contour-clair);
-    font-family: "Trebuchet MS", Arial, sans-serif;
-    box-sizing: border-box;
+  width: 100%;
+  min-height: 77px;
+  margin: 0;
+  gap: 20px;
+  background-color: var(--couleur-principale);
+  color: var(--couleur-contour-clair);
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  box-sizing: border-box;
 }
 
 .main {
-    padding: 0 24px 0 27px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  padding: 0 24px 0 27px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* LOGO */
 
 .header_logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    color: inherit;
-    transition: color var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: color var(--transition);
 }
 
 .header_logo svg {
-    height: 54px;
+  height: 54px;
 }
 
 .header_logo h1 {
-    font-size: 1.5rem;
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: inherit;
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: inherit;
 }
 
 .header_logo:hover {
-    color: white;
+  color: white;
 }
 
 .header_nav {
-    display: flex;
-    align-items: center;
-    gap: 29px;
+  display: flex;
+  align-items: center;
+  gap: 29px;
 }
 
 .header_user {
-    color: inherit;
-    white-space: nowrap;
+  color: inherit;
+  white-space: nowrap;
 }
 
 .header_separator {
-    width: 2px;
-    height: 34px;
-    flex-shrink: 0;
-    background-color: #dcc3aa;
+  width: 2px;
+  height: 34px;
+  flex-shrink: 0;
+  background-color: #dcc3aa;
 }
 
+/* Menu des actions d'administration. */
+.header_admin {
+  position: relative;
+}
 
+.header_admin > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.header_admin > summary::-webkit-details-marker {
+  display: none;
+}
+
+.header_admin > summary::after {
+  content: "▾";
+}
+
+.header_admin[open] > summary::after {
+  content: "▴";
+}
+
+.header_admin-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 10;
+  width: 15rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.5rem;
+  background: var(--couleur-surface, #fff);
+  color: var(--couleur-principale, #974315);
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);
+}
+
+.header_admin-menu a {
+  display: block;
+  padding: 0.75rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 0.25rem;
+}
+
+.header_admin-menu a:hover,
+.header_admin-menu a:focus-visible {
+  background: var(--couleur-fond, #e3d6c5);
+}
 
 /* RESPONSIVE */
 @media (max-width: 650px) {
-    .pp-header {
-        flex-direction: column;
-        padding: 15px;
-        gap: 15px;
-    }
+  .pp-header {
+    flex-direction: column;
+    padding: 15px;
+    gap: 15px;
+  }
 
-    .header_nav {
-        width: 100%;
-        justify-content: space-between;
-        gap: 8px;
-    }
+  .header_nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
 
-    .pp-header .header_button {
-        min-width: 0;
-        padding: 0 6px;
-    }
+  .pp-header .header_button {
+    min-width: 0;
+    padding: 0 6px;
+  }
 
-    .header_separator {
-        width: 1px;
-        height: 25px;
-    }
+  .header_separator {
+    width: 1px;
+    height: 25px;
+  }
 }

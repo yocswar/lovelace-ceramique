@@ -1,0 +1,40 @@
+/* Aperçu du tableau de bord avant la connexion aux données. */
+.tableau-de-bord {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.tableau-de-bord > h1 {
+  margin: 0;
+}
+
+.tableau-de-bord__information {
+  margin: 0;
+}
+
+.tableau-de-bord__statistiques {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1rem;
+}
+
+.tableau-de-bord__carte {
+  min-width: 0;
+  padding: 1.5rem;
+  background: var(--couleur-surface, #fff);
+  border-radius: 1rem;
+}
+
+.tableau-de-bord__carte h2 {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+}
+
+.tableau-de-bord__carte p {
+  margin: 0;
+}
+
+.tableau-de-bord__valeur {
+  font-size: 2.5rem;
+  font-weight: 700;
+}

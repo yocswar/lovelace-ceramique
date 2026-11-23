@@ -6,14 +6,14 @@ namespace App\Models;
 
 use PDO;
 
-// Accès à la table utilisateur (requêtes SQL uniquement).
+// Accès à la table utilisateur (requêtes SQL uniquement)
 final class UtilisateurModel
 {
     public function __construct(
         private PDO $pdo,
     ) {}
 
-    // Crée un utilisateur et renvoie son id.
+    // Crée un utilisateur et renvoie son id
     public function creer(
         string $identifiant,
         string $mdpHash,
@@ -24,8 +24,8 @@ final class UtilisateurModel
     ): int {
         $stmt = $this->pdo->prepare(
             'INSERT INTO utilisateur (identifiant, mdp, email, nom, organisation_id, role)
-             VALUES (:identifiant, :mdp, :email, :nom, :organisation_id, :role)
-             RETURNING id'
+            VALUES (:identifiant, :mdp, :email, :nom, :organisation_id, :role)
+            RETURNING id'
         );
         $stmt->execute([
             'identifiant' => $identifiant,
@@ -78,18 +78,36 @@ final class UtilisateurModel
         return $ligne;
     }
 
-    public function listerPourUtilisateur(int $idConnecte): array
-        {
-            $sql = "SELECT u.id, u.nom
-                    FROM utilisateur u
-                    JOIN utilisateur connecte
-                    ON u.organisation_id = connecte.organisation_id
-                    WHERE connecte.id = :id
-                    ORDER BY u.nom";
+    public function trouverParId(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id, role, organisation_id
+            FROM utilisateur
+            WHERE id = :id'
+        );
+        $stmt->execute(['id' => $id]);
 
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute(['id' => $idConnecte]);
+        $ligne = $stmt->fetch();
 
-            return $stmt->fetchAll();
+        if ($ligne === false) {
+            return null;
         }
+
+        return $ligne;
+    }
+    // Liste les utilisateurs de la même organisation que le compte connecté.
+    public function listerPourUtilisateur(int $idConnecte): array
+    {
+        $sql = "SELECT u.id, u.nom
+                FROM utilisateur u
+                JOIN utilisateur connecte
+                    ON u.organisation_id = connecte.organisation_id
+                WHERE connecte.id = :id
+                ORDER BY u.nom";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $idConnecte]);
+
+        return $stmt->fetchAll();
+    }
 }
