@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./AjoutUtilisateurForm.css";
 
 const champsInitiaux = {
   nom: "",
@@ -76,7 +77,11 @@ export default function AjoutUtilisateurForm() {
   }
 
   return (
-    <form onSubmit={soumettre} aria-busy={chargement}>
+    <form
+      className="ajout-utilisateur"
+      onSubmit={soumettre}
+      aria-busy={chargement}
+    >
       <h2>Ajouter un utilisateur</h2>
 
       <label>
@@ -142,12 +147,21 @@ export default function AjoutUtilisateurForm() {
         </select>
       </label>
 
-      <button type="submit" disabled={chargement}>
+      <button type="submit" className="btn btn--plein" disabled={chargement}>
         {chargement ? "Création..." : "Créer le compte"}
       </button>
 
-      {message && <p role="status">{message}</p>}
-      {erreur && <p role="alert">{erreur}</p>}
+      {message && (
+        <p role="status" className="ajout-utilisateur__succes">
+          {message}
+        </p>
+      )}
+
+      {erreur && (
+        <p role="alert" className="ajout-utilisateur__erreur">
+          {erreur}
+        </p>
+      )}
     </form>
   );
 }
