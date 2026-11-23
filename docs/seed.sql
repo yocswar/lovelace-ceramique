@@ -14,14 +14,19 @@ INSERT INTO utilisateur (identifiant, mdp, email, nom, organisation_id, role) VA
  ('lea', '$2y$10$pLmg3szwTg.VwQQ4VlGfmO5YKGTNCZiSBbDqs553hgVOswi0B4Dza', 'lea@atelier.fr', 'Léa Fontaine', 1, 'Collaborateur'),
  ('malik', '$2y$10$pLmg3szwTg.VwQQ4VlGfmO5YKGTNCZiSBbDqs553hgVOswi0B4Dza', 'malik@atelier.fr', 'Malik Benali', 1, 'Collaborateur');
 
--- Étapes de fabrication, dans l'ordre de l'atelier
+-- Étapes de fabrication : 9 étapes, décidées en équipe le 13/11. L'affichage suit la colonne "ordre".
+-- Les 6 étapes d'origine sont insérées en premier pour garder les id 1 à 6 utilisés par les tickets plus bas.
+-- Les 3 ajoutées prennent les id 7, 8 et 9 : même résultat que docs/migration-etapes.sql sur une base existante.
 INSERT INTO etape (nom, ordre) VALUES
- ('Façonnage', 1),
- ('Séchage', 2),
- ('Cuisson biscuit', 3),
- ('Émaillage', 4),
- ('Cuisson émail', 5),
- ('Terminé', 6);
+ ('Façonnage', 2),
+ ('Séchage', 3),
+ ('Cuisson biscuit', 5),
+ ('Émaillage', 6),
+ ('Cuisson émail', 7),
+ ('Terminé', 8),
+ ('À faire', 1),
+ ('Décor', 4),
+ ('Perte', 9);
 
 -- Modèles de pièce
 INSERT INTO piece (nom) VALUES
