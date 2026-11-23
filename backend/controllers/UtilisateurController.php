@@ -101,54 +101,144 @@ final class UtilisateurController
         }
     }
 
-public function creerCollaborateur(): void
-{
-    header('Content-Type: application/json; charset=utf-8');
+    public function creerCollaborateur(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
 
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Allow: POST');
-        $this->repondreErreur(405, 'Méthode non autorisée');
-        return;
-    }
-
-    $claims = JwtAuth::utilisateurConnecte();
-
-    if ($claims === null) {
-        $this->repondreErreur(401, 'Authentification requise');
-        return;
-    }
-
-    $utilisateurId = $claims['sub'] ?? null;
-
-    if (!is_int($utilisateurId) || $utilisateurId <= 0) {
-        $this->repondreErreur(401, 'Jeton invalide');
-        return;
-    }
-
-    try {
-        $pdo = require __DIR__ . '/../config/db.php';
-        $utilisateurModel = new UtilisateurModel($pdo);
-        $utilisateur = $utilisateurModel->trouverParId($utilisateurId);
-
-        if ($utilisateur === null) {
-            $this->repondreErreur(401, 'Compte introuvable');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Allow: POST');
+            $this->repondreErreur(405, 'Méthode non autorisée');
             return;
         }
 
-        if ($utilisateur['role'] !== 'Administrateur') {
-            $this->repondreErreur(403, 'Accès réservé aux administrateurs');
+        // Vérifie le token de l'utilisateur connecté.
+        $claims = JwtAuth::utilisateurConnecte();
+
+        if ($claims === null) {
+            $this->repondreErreur(401, 'Authentification requise');
             return;
         }
 
-        $this->repondreErreur(
-            501,
-            'Création du collaborateur non disponible'
-        );
-    } catch (Throwable $e) {
-        error_log($e->getMessage());
-        $this->repondreErreur(500, 'Impossible de vérifier les droits');
+        $utilisateurId = $claims['sub'] ?? null;
+
+        if (!is_int($utilisateurId) || $utilisateurId <= 0) {
+            $this->repondreErreur(401, 'Jeton invalide');
+            return;
+        }
+
+        try {
+            $pdo = require __DIR__ . '/../config/db.php';
+            $utilisateurModel = new UtilisateurModel($pdo);
+
+            // Récupère le rôle et l'organisation actuels du compte.
+            $utilisateur = $utilisateurModel->trouverParId($utilisateurId);
+
+            if ($utilisateur === null) {
+                $this->repondreErreur(401, 'Compte introuvable');
+                return;
+            }
+
+            if ($utilisateur['role'] !== 'Administrateur') {
+                $this->repondreErreur(403, 'Accès réservé aux administrateurs');
+                return;
+            }
+
+            // Lit les données envoyées par le formulaire.
+            $payload = json_decode(
+                (string) file_get_contents('php://input'),
+                true
+            );
+
+            if (!is_array($payload)) {
+                $this->repondreErreur(400, 'Corps JSON invalide');
+                return;
+            }
+
+            // Vérifie que chaque champ obligatoire contient du texte.
+            foreach (['identifiant', 'mdp', 'email', 'nom'] as $champ) {
+                if (!isset($payload[$champ]) || !is_string($payload[$champ])) {
+                    $this->repondreErreur(
+                        422,
+                        'Les champs du compte doivent être des textes'
+                    );
+                    return;
+                }
+            }
+
+            $identifiant = trim($payload['identifiant']);
+            $mdp = $payload['mdp'];
+            $email = trim($payload['email']);
+            $nom = trim($payload['nom']);
+
+            // Applique les règles communes aux comptes utilisateurs.
+            $validator = new UtilisateurValidator();
+            $erreurs = $validator->validerUtilisateur(
+                $identifiant,
+                $mdp,
+                $email,
+                $nom,
+            );
+
+            if ($erreurs !== []) {
+                $this->repondreErreur(422, 'Données invalides', $erreurs);
+                return;
+            }
+
+            // Vérifie la disponibilité de l'identifiant et de l'email.
+            if ($utilisateurModel->identifiantExiste($identifiant)) {
+                $this->repondreErreur(409, 'Cet identifiant est déjà utilisé');
+                return;
+            }
+
+            if ($utilisateurModel->emailExiste($email)) {
+                $this->repondreErreur(409, 'Cet email est déjà utilisé');
+                return;
+            }
+
+            // Utilise l'organisation de l'administrateur et fixe le rôle.
+            $organisationId = (int) $utilisateur['organisation_id'];
+
+            $nouvelUtilisateurId = $utilisateurModel->creer(
+                $identifiant,
+                password_hash($mdp, PASSWORD_DEFAULT),
+                $email,
+                $nom,
+                $organisationId,
+                'Collaborateur',
+            );
+
+            // Confirme la création sans renvoyer le mot de passe.
+            http_response_code(201);
+
+            echo json_encode([
+                'status' => 'ok',
+                'message' => 'Le compte collaborateur a été créé',
+                'utilisateur' => [
+                    'id' => $nouvelUtilisateurId,
+                    'identifiant' => $identifiant,
+                    'email' => $email,
+                    'nom' => $nom,
+                    'organisation_id' => $organisationId,
+                    'role' => 'Collaborateur',
+                ],
+            ]);
+        } catch (\PDOException $e) {
+            // Gère aussi un doublon créé par deux requêtes simultanées.
+            if ($e->getCode() === '23505') {
+                $this->repondreErreur(
+                    409,
+                    'Cet identifiant ou cet email est déjà utilisé'
+                );
+                return;
+            }
+
+            error_log($e->getMessage());
+            $this->repondreErreur(500, 'Impossible de créer le collaborateur');
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            $this->repondreErreur(500, 'Impossible de créer le collaborateur');
+        }
     }
-}
 
     /** @param list<string>|null $erreurs */
     private function repondreErreur(int $code, string $message, ?array $erreurs = null): void
