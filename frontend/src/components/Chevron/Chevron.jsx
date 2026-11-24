@@ -1,6 +1,5 @@
 import "./Chevron.css";
 
-// Chevron de repli/dépliement.
 // Plié → ">" (pointe à droite) ; déplié → "v" (pointe vers le bas).
 function Chevron({ plie = false }) {
   return (
