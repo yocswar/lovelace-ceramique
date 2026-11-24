@@ -28,8 +28,6 @@ Chaque matin, Claire, céramiste et fondatrice d'un atelier, perd du temps à re
 | **Admin**        | Créer, supprimer et configurer les étapes, définir les échéances, déplacer les objets entre étapes, ajouter des membres et attribuer des rôles ; dispose également des droits de contribution. |
 | **Contributeur** | Créer et attribuer des tâches, les valider et faire progresser les objets dans le workflow, selon les droits retenus.                                                                          |
 
-> La répartition exacte des permissions devra être précisée avant l'implémentation de l'authentification et de l'autorisation.
-
 ## 3. Périmètre fonctionnel
 
 ### V1 — Must have
@@ -88,7 +86,7 @@ PHP-FPM 8.5
 PostgreSQL 17
 ```
 
-Le frontend React fonctionne **hors Docker** pendant le développement. Docker exécute Nginx, PHP, PostgreSQL et pgAdmin. Le proxy de `frontend/vite.config.js` redirige les requêtes `/api` vers Nginx ; les composants peuvent donc appeler `fetch('/api/healthcheck')` sans URL absolue.
+Docker exécute Node, React, Nginx, PHP, PostgreSQL et pgAdmin. Le proxy de `frontend/vite.config.js` redirige les requêtes `/api` vers le conteneur Nginx ; les composants peuvent donc appeler `fetch('/api/healthcheck')` sans URL absolue.
 
 ## 5. Installation et démarrage
 
@@ -107,8 +105,6 @@ Le frontend React fonctionne **hors Docker** pendant le développement. Docker e
 git clone https://github.com/yocswar/lovelace-ceramique.git lovelace-ceramique
 cd lovelace-ceramique
 ```
-
-> Tant que la pull request d'architecture n'est pas fusionnée, les instructions React/PHP ci-dessous correspondent à la branche `chore/project-architecture`, et pas nécessairement à `main`.
 
 ### Étape 2 — Configurer l'environnement
 
@@ -194,10 +190,20 @@ Dans **Register → Server**, renseigner :
 
 **Important :** dans pgAdmin exécuté sous Docker, l'hôte est **`postgres`**, et non `localhost`. Les identifiants de PostgreSQL doivent correspondre aux valeurs effectives de `.env` et de la base initialisée.
 
+### Étape 7 — Initialiser la base de données
+
+#### 1 - Initialisation de la base de données (obligatoire)
+
+Exécutez le script [MPD.sql](docs/MPD.sql) pour créer les ENUM et l'ensemble des tables requises par l'application.
+
+#### 2 - Données de test (facultatif)
+
+Pour peupler la base avec des données de démonstration, exécutez le script [seed.sql](docs/seed.sql).
+
 ### Arrêter et redémarrer
 
 - **Services Docker :** depuis la racine du dépôt, `docker compose down`.
-- **Redémarrage :** `docker compose up -d`, puis `npm run dev` depuis `frontend/`.
+- **Redémarrage :** `docker compose up --build -d`.
 
 Ne pas utiliser `docker compose down -v` pour un arrêt normal : l'option `-v` supprime les volumes Docker et peut entraîner une perte de données PostgreSQL.
 
