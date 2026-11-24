@@ -17,12 +17,12 @@ function Commandes() {
     const entetes = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${getToken()}`,
-      };
+    };
 
     useEffect(() => {
         async function chargerCommande() {
             try {
-                if(!utilisateur) {
+                if (!utilisateur) {
                     throw new Error("Erreur lors de la récupération des informations de l'utilisateur");
                 }
                 const response = await fetch("/api/commandes?id=" + utilisateur.organisation_id, {
@@ -44,28 +44,28 @@ function Commandes() {
             }
         }
         chargerCommande();
-        },[])
+    }, [])
 
 
     return (
         <>
-        <section className="commande-section">
+            <section className="commande-section">
 
-            {message && <p>{message}</p>}
+                {message && <p>{message}</p>}
 
-            {commandes.map((commande) => (
-                <article  key={commande.id} className="commande-carte">
-                    
-                    <header className="commande-header">
-                        <h2> Commande n°{commande.id} - {commande.nom_client} - {affichageStatut(commande.statut)}</h2>
-                    </header>
+                {commandes.map((commande) => (
+                    <article key={commande.id} className="commande-carte">
 
-                    <Kanban commandeId={commande.id}/>
-                </article>
-            ))}
-        </section>
+                        <Kanban
+                            commandeId={commande.id}
+                            titre={`Commande n°${commande.id} - ${commande.nom_client} - ${affichageStatut(commande.statut)}`}
+                        />
+
+                    </article>
+                ))}
+            </section>
         </>
-        );
+    );
 }
 
 function affichageStatut(statut) {

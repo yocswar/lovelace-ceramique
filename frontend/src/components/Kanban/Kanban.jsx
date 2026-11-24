@@ -3,7 +3,7 @@ import Toast from "../Toast/Toast";
 import "./Kanban.css";
 
 // Kanban d'une commande (US.14). On glisse une carte dans n'importe quelle colonne pour changer son étape (US.12).
-function Kanban({ commandeId }) {
+function Kanban({ commandeId, titre }) {
   const [etapes, setEtapes] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,8 +29,8 @@ function Kanban({ commandeId }) {
         Authorization: "Bearer " + localStorage.getItem("token")
       }
     })
-    .then(response => response.json())
-    .then(data => setUtilisateurs(data.utilisateurs));
+      .then(response => response.json())
+      .then(data => setUtilisateurs(data.utilisateurs));
   };
 
   const chargerKanban = useCallback(async () => {
@@ -45,7 +45,7 @@ function Kanban({ commandeId }) {
       setEtapes(data.etapes);
       setTickets(data.tickets);
     } catch (error) {
-      showToast("error",error.message);
+      showToast("error", error.message);
     } finally {
       setLoading(false);
     }
@@ -79,19 +79,19 @@ function Kanban({ commandeId }) {
           ticket.id === ticketId ? { ...ticket, etape_id: data.etape.id } : ticket,
         ),
       );
-      showToast("success",data.message);
+      showToast("success", data.message);
       // US.13 : on se fie à la réponse du back, qui connaît le vrai nom de l'étape
       if (data.etape.nom === "Perte") {
         setTicketPerdu(tickets.find((ticket) => ticket.id === ticketId));
       }
     } catch (error) {
-      showToast("error",error.message);
+      showToast("error", error.message);
     } finally {
       setEnCours(null);
     }
   }
 
-    async function recreerPiece() {
+  async function recreerPiece() {
     try {
       const response = await fetch("/api/tickets", {
         method: "POST",
@@ -108,9 +108,9 @@ function Kanban({ commandeId }) {
       // etapes[0] = "À faire", car le back renvoie les étapes triées par ordre.
       const nouvelleCarte = { ...ticketPerdu, id: data.ticket_id, etape_id: etapes[0].id, artisan: null };
       setTickets((prev) => [...prev, nouvelleCarte]);
-      showToast("success",data.message);
+      showToast("success", data.message);
     } catch (error) {
-      showToast("error",error.message);
+      showToast("error", error.message);
     } finally {
       setTicketPerdu(null);
     }
@@ -148,12 +148,56 @@ function Kanban({ commandeId }) {
     }
   }
 
+  function calculerProgressionTicket(ticket) {
+
+    const etapesFabrication = etapes.filter(
+      (etape) => etape.nom !== "Perte"
+    );
+
+    const indexEtape = etapesFabrication.findIndex(
+      (etape) => etape.id === ticket.etape_id
+    );
+
+    if (indexEtape === -1 || etapesFabrication.length <= 1) {
+      return 0;
+    }
+
+    return (indexEtape / (etapesFabrication.length - 1)) * 100;
+  }
+
+  function calculerProgressionCommande() {
+    if (tickets.length === 0) {
+      return 0;
+    }
+
+    let progressionTotale = 0;
+
+    tickets.forEach((ticket) => {
+      progressionTotale += calculerProgressionTicket(ticket);
+    });
+
+    return progressionTotale / tickets.length;
+  }
+
+  const progressionCommande = calculerProgressionCommande();
+
   if (loading) {
     return <p>Chargement de l&apos;atelier…</p>;
   }
 
   return (
     <section className="kanban-section">
+      <header className="commande-header">
+        <h2>{titre}</h2>
+
+        <div className="progression-commande">
+          <progress
+            value={progressionCommande}
+            max={100}
+          />
+          <span>{Math.round(progressionCommande)}%</span>
+        </div>
+      </header>
       {message && (
         <p role="status" className={`connection-message ${status}`}>
           {message}
@@ -267,7 +311,7 @@ function Kanban({ commandeId }) {
         </div>
       )}
       {toast && <Toast type={toast.type} message={toast.message} />}
-    </section> 
+    </section>
   );
 }
 
