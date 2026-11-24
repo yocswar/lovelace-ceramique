@@ -13,6 +13,28 @@ final class CommandeModel
 {
     public function __construct(private PDO $pdo) {}
 
+    // Récupération des commandes avec le statut "a_faire" ou "en_cours" de la plus ancienne à la plus récente
+    public function recupererCommandesEnCours(int $id): array
+    {
+        try {
+            // date_creation et statut ('a_faire') sont remplis par les DEFAULT de la table
+            $stmt = $this->pdo->prepare(
+                "SELECT c.id,c.nom_client, c.statut
+                FROM commande c
+                JOIN utilisateur u on u.id = c.utilisateur_id
+                WHERE c.statut IN ('a_faire', 'en_cours')
+                AND u.organisation_id = :orga_id
+                ORDER BY c.date_creation"
+            );
+
+            $stmt->execute(['orga_id' => $id]);
+
+            return $stmt->fetchAll();
+        } catch (Throwable $e) {
+            throw $e; // le contrôleur loggue et répond 500
+        }
+    }
+
     // La première étape du circuit (ordre le plus petit) : c'est là que démarre chaque nouveau ticket.
     // Renvoie null si la table etape est vide.
     public function premiereEtapeId(): ?int

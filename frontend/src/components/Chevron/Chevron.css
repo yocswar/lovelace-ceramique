@@ -1,9 +1,12 @@
 .chevron {
   display: inline-block;
   transition: transform 0.2s ease;
-  transform: rotate(90deg); /* état par défaut = déplié → pointe vers le bas ∨ */
 }
 
 .chevron--plie {
-  transform: rotate(0deg); /* plié → pointe à droite > */
+  transform: rotate(0deg);
+}
+
+.chevron--deplie {
+  transform: rotate(90deg);
 }

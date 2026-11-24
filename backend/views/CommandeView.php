@@ -7,6 +7,15 @@ namespace App\Views;
 
 final class CommandeView
 {
+    public function retourCommandes(array $result): void
+    {
+        $this->send(200, [
+            'status' => 'ok',
+            'message' => 'Récupération des commandes en cours effectuées.',
+            'commandes' => $result
+        ]);
+    }
+
     // 201 = « créé » : la commande et ses tickets existent maintenant en base
     public function creee(int $commandeId, int $nbTickets): void
     {

@@ -100,6 +100,35 @@ final class UtilisateurController
         }
     }
 
+    public function lister(): void
+    {
+        header('Content-Type: application/json');
+
+        $connecte = \App\Services\JwtAuth::utilisateurConnecte();
+
+        if ($connecte === null) {
+            http_response_code(401);
+            echo json_encode(['message' => 'Non connecté']);
+            return;
+        }
+
+        try {
+            $pdo = require __DIR__ . '/../config/db.php';
+
+            $model = new UtilisateurModel($pdo);
+
+            $utilisateurs = $model->listerPourUtilisateur(
+                (int) $connecte['sub']
+            );
+
+            echo json_encode(['utilisateurs' => $utilisateurs]);
+        } catch (\Throwable $e) {
+            error_log($e->getMessage());
+            http_response_code(500);
+            echo json_encode(['message' => 'Erreur serveur']);
+        }
+    }
+
     /** @param list<string>|null $erreurs */
     private function repondreErreur(int $code, string $message, ?array $erreurs = null): void
     {
