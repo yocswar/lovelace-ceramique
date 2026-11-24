@@ -12,6 +12,8 @@ use App\Controllers\UtilisateurController;
 use App\Controllers\HealthcheckController;
 use App\Controllers\AuthController;
 use App\Controllers\TicketController;
+use App\Controllers\CommandeController;
+use App\Controllers\PieceController;
 
 // Récupérer la route demandée
 $method = $_SERVER['REQUEST_METHOD'];
@@ -52,7 +54,59 @@ switch ($path) {
                 $controller->index();
                 break;
             case 'PATCH':
-                $controller->etapeSuivante();
+                $controller->changerEtape();
+                break;
+            case 'POST':
+                $controller->recreer();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Méthode non autorisée'
+                ]);
+                break;
+        }
+        break;
+
+    case '/api/tickets/assignation':
+        $controller = new TicketController();
+
+        if ($method === 'PATCH') {
+            $controller->assignerUtilisateur();
+        } else {
+            http_response_code(405);
+            echo json_encode(['message' => 'Méthode non autorisée']);
+        }
+
+        break;
+
+    // Création de commande : le catalogue de pièces alimente la liste déroulante du formulaire
+    case '/api/pieces':
+        $controller = new PieceController();
+        switch ($method) {
+            case 'GET':
+                $controller->index();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Méthode non autorisée'
+                ]);
+                break;
+        }
+        break;
+
+    // Création de commande : la commande + un ticket par pièce à fabriquer
+    case '/api/commandes':
+        $controller = new CommandeController();
+        switch ($method) {
+            case 'GET':
+                $controller->index();
+                break;
+            case 'POST':
+                $controller->creer();
                 break;
             default:
                 http_response_code(405);
@@ -68,7 +122,7 @@ switch ($path) {
         $controller = new UtilisateurController();
         switch ($method) {
             case 'GET':
-                // $controller->get();
+                $controller->lister();
                 break;
             case 'POST':
                 $controller->creer();

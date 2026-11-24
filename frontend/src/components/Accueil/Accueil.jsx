@@ -1,13 +1,15 @@
 import { useState } from "react";
-import InscriptionForm from "../InscriptionForm/InscriptionForm";
-import FormulaireConnexion from "../FormulaireConnexion/FormulaireConnexion";
-import Kanban from "../Kanban/Kanban";
+import { useNavigate } from "react-router-dom";
+import Commandes from "../Commandes/Commandes";
+import "./Accueil.css";
+import IconePlus from "../IconePlus/IconePlus";
 
 function Accueil() {
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-  const [utilisateurs, setUtilisateurs] = useState([]);
+  const [utilisateur, setUtilisateur] = useState([]);
 
   async function verifierConnexion() {
     setLoading(true);
@@ -42,7 +44,7 @@ function Accueil() {
     }
   }
 
-  async function getUtilisateurs() {
+  async function getUtilisateur() {
     setLoading(true);
     setMessage("");
     setStatus("");
@@ -64,7 +66,7 @@ function Accueil() {
       if (data.status === "ok" && data.database === "connected") {
         setMessage(data.message);
         setStatus("success");
-        setUtilisateurs(data.result);
+        setUtilisateur(data.result);
       } else {
         throw new Error("La base de données est indisponible");
       }
@@ -78,54 +80,13 @@ function Accueil() {
 
   return (
     <main className="app">
-      <header>
-        <h1>Lovelace Céramique</h1>
-        <p>Gestion de production pour les ateliers de céramique</p>
-      </header>
-
-      <section>
-        <h2>Bienvenue dans votre atelier</h2>
-
-        <p>
-          Suivez vos objets, vos étapes de fabrication et vos tâches de
-          production.
-        </p>
-
-        <button type="button" onClick={verifierConnexion} disabled={loading}>
-          {loading ? "Vérification..." : "Vérifier la connexion"}
+      <section className="accueil-section">
+        <button type="button" className="btn btn--plein" onClick={() => navigate("/creation-commande")}>
+          <IconePlus />
+          Nouvelle commande
         </button>
-
-        {message && (
-          <p role="status" className={`connection-message ${status}`}>
-            {message}
-          </p>
-        )}
-
-        <button type="button" onClick={getUtilisateurs} disabled={loading}>
-          {loading ? "Récupération..." : "Récupérer les utilisateurs"}
-        </button>
-
-        {message && (
-          <p role="status" className={`connection-message ${status}`}>
-            {message}
-          </p>
-        )}
-
-        {utilisateurs.length > 0 && (
-          <div>
-            <h3>Liste des utilisateurs :</h3>
-            <ul>
-              {utilisateurs.map((utilisateur) => (
-                <li key={utilisateur.id}>
-                  {utilisateur.nom} - {utilisateur.email}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </section>
-      <Kanban commandeId={17} />
-      <InscriptionForm/>
+      <Commandes/>
     </main>
   );
 }
