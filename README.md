@@ -192,9 +192,13 @@ Dans **Register → Server**, renseigner :
 
 ### Étape 7 — Initialiser la base de données
 
-Dans un premier temps, passer le script sql [MPD.sql](docs/MPD.sql) pour créer tous les ENUM et toutes les tables nécessaires au bon fonctionnement de l'application.
+#### 1 - Initialisation de la base de données (obligatoire)
 
-Dans un second temps, facultativement, il est possible de remplir les tables avec des données de tests. Pour cela, il suffit de passer le script sql [seed.sql](docs/seed.sql)
+Exécutez le script [MPD.sql](docs/MPD.sql) pour créer les ENUM et l'ensemble des tables requises par l'application.
+
+#### 2 - Données de test (facultatif)
+
+Pour peupler la base avec des données de démonstration, exécutez le script [seed.sql](docs/seed.sql).
 
 ### Arrêter et redémarrer
 
