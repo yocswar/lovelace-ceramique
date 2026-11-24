@@ -33,7 +33,16 @@ final class TicketView
             'ticket_id' => $nouvelId,
         ]);
     }
-
+        // US.16 : confirme la suppression ; React retire la carte du Kanban
+    public function ticketSupprime(int $ticketId): void
+    {
+        $this->send(200, [
+            'status' => 'ok',
+            'message' => 'Ticket supprimé',
+            'ticket_id' => $ticketId,
+        ]);
+    }
+    
     // Toutes les erreurs passent par ici, avec un message lisible (jamais le détail technique)
     public function error(int $code, string $message): void
     {

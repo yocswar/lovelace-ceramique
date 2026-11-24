@@ -59,6 +59,9 @@ switch ($path) {
             case 'POST':
                 $controller->recreer();
                 break;
+            case 'DELETE':
+                $controller->supprimer();
+                break;
             default:
                 http_response_code(405);
                 echo json_encode([

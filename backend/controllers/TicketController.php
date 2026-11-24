@@ -2,6 +2,7 @@
 // Contrôleur des tickets : reçoit la requête, vérifie la méthode, demande aux modèles, répond via la vue.
 // GET   /api/tickets                      → US.14 (voir les commandes à faire)
 // PATCH /api/tickets/{id}/etape-suivante  → US.12 (passer la pièce à l'étape suivante)
+// DELETE /api/tickets                     → US.16 (supprimer un ticket)
 
 declare(strict_types=1);
 
@@ -154,6 +155,53 @@ final class TicketController
         } catch (Throwable $e) {
             error_log($e->getMessage());
             $this->view->error(500, 'Erreur lors de l’assignation');
+        }
+    }
+        // US.16 : supprime un ticket (suppression logique) après confirmation côté React
+    public function supprimer(): void
+    {
+        $connecte = \App\Services\JwtAuth::utilisateurConnecte();
+
+        if ($connecte === null) {
+            $this->view->error(401, 'Non connecté');
+            return;
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = (int) ($data['id'] ?? 0);
+
+        if ($id <= 0) {
+            $this->view->error(400, 'Identifiant invalide');
+            return;
+        }
+
+        try {
+            /** @var PDO $pdo */
+            $pdo = require __DIR__ . '/../config/db.php';
+            $ticketModel = new TicketModel($pdo);
+
+            if ($ticketModel->findById($id) === null) {
+                $this->view->error(404, 'Ticket introuvable');
+                return;
+            }
+
+            // Le ticket doit appartenir à l'organisation de l'utilisateur connecté
+            if (!$ticketModel->appartientALOrganisation($id, (int) $connecte['sub'])) {
+                $this->view->error(403, 'Suppression non autorisée');
+                return;
+            }
+
+            // Une commande doit garder au moins un ticket
+            if ($ticketModel->compterActifsDeLaCommande($id) <= 1) {
+                $this->view->error(409, 'Impossible de supprimer le dernier ticket de la commande');
+                return;
+            }
+
+            $ticketModel->supprimer($id);
+            $this->view->ticketSupprime($id);
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            $this->view->error(500, 'Impossible de supprimer le ticket');
         }
     }
 }
