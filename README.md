@@ -194,6 +194,12 @@ Dans **Register → Server**, renseigner :
 
 **Important :** dans pgAdmin exécuté sous Docker, l'hôte est **`postgres`**, et non `localhost`. Les identifiants de PostgreSQL doivent correspondre aux valeurs effectives de `.env` et de la base initialisée.
 
+### Étape 7 — Initialiser la base de données
+
+Dans un premier temps, passer le script sql [MPD.sql](docs/MPD.sql) pour créer tous les ENUM et toutes les tables nécessaires au bon fonctionnement de l'application.
+
+Dans un second temps, facultativement, il est possible de remplir les tables avec des données de tests. Pour cela, il suffit de passer le script sql [seed.sql](docs/seed.sql)
+
 ### Arrêter et redémarrer
 
 - **Services Docker :** depuis la racine du dépôt, `docker compose down`.
