@@ -8,11 +8,10 @@ function Kanban({ commandeId }) {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
-  const [enCours, setEnCours] = useState(null); // carte en cours d'envoi au back
-  const [ticketGlisse, setTicketGlisse] = useState(null); // carte en train d'être glissée
-  const [colonneSurvolee, setColonneSurvolee] = useState(null); // colonne sous la souris pendant le glisser
+  const [enCours, setEnCours] = useState(null);
+  const [ticketGlisse, setTicketGlisse] = useState(null);
+  const [colonneSurvolee, setColonneSurvolee] = useState(null);
 
-  // [commandeId] : on recharge si la commande change
   useEffect(() => {
     async function chargerKanban() {
       try {
@@ -43,9 +42,7 @@ function Kanban({ commandeId }) {
     try {
       const response = await fetch(`/api/tickets`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: ticketId, etape_id: etapeId }),
       });
       const data = await response.json();
@@ -54,7 +51,6 @@ function Kanban({ commandeId }) {
         throw new Error(data.message || "Changement d'étape impossible");
       }
 
-      // Mise à jour locale : la carte change de colonne sans recharger la page
       setTickets((prev) =>
         prev.map((ticket) =>
           ticket.id === ticketId ? { ...ticket, etape_id: data.etape.id } : ticket,
@@ -90,7 +86,6 @@ function Kanban({ commandeId }) {
       <div className="kanban">
         {etapes.map((etape) => {
           const cartes = tickets.filter((ticket) => ticket.etape_id === etape.id);
-          // Toutes les colonnes acceptent la carte, sauf celle où elle est déjà
           const estCible = ticketGlisse !== null && ticketGlisse.etape_id !== etape.id;
 
           return (
@@ -99,12 +94,11 @@ function Kanban({ commandeId }) {
               className={`kanban-colonne ${estCible && colonneSurvolee === etape.id ? "kanban-colonne--cible" : ""}`}
               onDragOver={(event) => {
                 if (!estCible) return;
-                event.preventDefault(); // preventDefault = « j'accepte la carte ici »
+                event.preventDefault();
                 setColonneSurvolee(etape.id);
               }}
               onDrop={(event) => {
                 event.preventDefault();
-                // dataTransfer stocke du texte : Number() le remet en nombre, comme ticket.id
                 const ticketId = Number(event.dataTransfer.getData("text/plain"));
                 finGlisser();
                 changerEtape(ticketId, etape.id);
@@ -119,10 +113,9 @@ function Kanban({ commandeId }) {
                 <article
                   key={ticket.id}
                   className={`kanban-carte ${enCours === ticket.id ? "kanban-carte--en-cours" : ""}`}
-                  draggable={enCours !== ticket.id} // pas de nouveau glisser pendant l'envoi
+                  draggable={enCours !== ticket.id}
                   onDragStart={(event) => {
                     event.dataTransfer.setData("text/plain", String(ticket.id));
-                    // dataTransfer n'est pas lisible pendant le survol : on garde la carte dans un état
                     setTicketGlisse(ticket);
                   }}
                   onDragEnd={finGlisser}
