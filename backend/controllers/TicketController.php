@@ -46,7 +46,7 @@ final class TicketController
         }
     }
 
-        // US.12 : déplace le ticket vers l'étape choisie par glisser-déposer (en avant, en arrière ou en Perte)
+    // US.12 : déplace le ticket vers l'étape choisie par glisser-déposer (en avant, en arrière ou en Perte)
     public function changerEtape(): void
     {
         $data = json_decode(file_get_contents('php://input'), true);
@@ -76,6 +76,84 @@ final class TicketController
         } catch (Throwable $e) {
             error_log($e->getMessage());
             $this->view->error(500, 'Impossible de changer l\'étape');
+        }
+    }
+
+    // US.13 : après une perte, l'artisan peut relancer la même pièce depuis le début
+    public function recreer(): void
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $ticketPerduId = (int) ($data['ticket_id'] ?? 0);
+
+        try {
+            /** @var PDO $pdo */
+            $pdo = require __DIR__ . '/../config/db.php';
+            $nouvelId = (new TicketModel($pdo))->recreer($ticketPerduId);
+
+            if ($nouvelId === null) {
+                $this->view->error(404, 'Ticket introuvable');
+                return;
+            }
+
+            $this->view->ticketRecree($nouvelId);
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            $this->view->error(500, 'Impossible de recréer la pièce');
+        }
+    }
+
+    public function assignerUtilisateur(): void
+    {
+        // Vérifier que l'utilisateur est connecté
+        $connecte = \App\Services\JwtAuth::utilisateurConnecte();
+
+        if ($connecte === null) {
+            $this->view->error(401, 'Non connecté');
+            return;
+        }
+
+        // Récupérer les données envoyées par React
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $ticketId = (int) ($data['id'] ?? 0);
+        $utilisateurId = isset($data['utilisateur_id'])
+            ? (int) $data['utilisateur_id']
+            : null;
+
+        if ($ticketId <= 0 || ($utilisateurId !== null && $utilisateurId <= 0)) {
+            $this->view->error(400, 'Identifiant invalide');
+            return;
+        }
+
+        try {
+            $pdo = require __DIR__ . '/../config/db.php';
+
+            $ticketModel = new TicketModel($pdo);
+
+            if ($ticketModel->findById($ticketId) === null) {
+                $this->view->error(404, 'Ticket introuvable');
+                return;
+            }
+
+            // Vérifier que l'assignation est autorisée
+            if (!$ticketModel->verifierAssignation(
+                $ticketId,
+                $utilisateurId ?? (int) $connecte['sub'],
+                (int) $connecte['sub']
+            )) {
+                $this->view->error(403, 'Assignation non autorisée');
+                return;
+            }
+
+            // Enregistrer l'assignation
+            $ticketModel->assignerUtilisateur($ticketId, $utilisateurId);
+
+
+            header('Content-Type: application/json');
+            echo json_encode(['message' => 'Assignation enregistrée']);
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            $this->view->error(500, 'Erreur lors de l’assignation');
         }
     }
 }

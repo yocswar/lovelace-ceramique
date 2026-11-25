@@ -54,4 +54,62 @@ final class TicketModel
         $stmt = $this->pdo->prepare('UPDATE commande_ticket SET etape_id = :etape_id WHERE id = :id');
         $stmt->execute(['etape_id' => $etapeId, 'id' => $ticketId]);
     }
+
+    public function assignerUtilisateur(int $ticketId, ?int $utilisateurId): void
+    {
+        $stmt = $this->pdo->prepare(
+            "UPDATE commande_ticket
+            SET utilisateur_id = :utilisateur_id
+            WHERE id = :id"
+        );
+
+        $stmt->execute([
+            'utilisateur_id' => $utilisateurId,
+            'id' => $ticketId
+        ]);
+    }
+
+    public function verifierAssignation(
+        int $ticketId,
+        int $utilisateurId,
+        int $connecteId
+    ): bool {
+        $sql = "SELECT 1
+                FROM commande_ticket t
+                JOIN commande c ON c.id = t.commande_id
+                JOIN utilisateur createur ON createur.id = c.utilisateur_id
+                JOIN utilisateur cible ON cible.id = :utilisateur_id
+                JOIN utilisateur connecte ON connecte.id = :connecte_id
+                WHERE t.id = :ticket_id
+                AND createur.organisation_id = connecte.organisation_id
+                AND cible.organisation_id = connecte.organisation_id";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            'ticket_id' => $ticketId,
+            'utilisateur_id' => $utilisateurId,
+            'connecte_id' => $connecteId
+        ]);
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    // US.13 : recrée la pièce perdue (même pièce, même commande) dans la première étape.
+    // L'artisan n'est pas copié : la nouvelle pièce repart sans personne assignée.
+    public function recreer(int $ticketPerduId): ?int
+    {
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO commande_ticket (piece_id, commande_id, etape_id)
+             SELECT piece_id, commande_id,
+                    (SELECT id FROM etape ORDER BY ordre LIMIT 1)
+             FROM commande_ticket
+             WHERE id = :id
+             RETURNING id'
+        );
+        $stmt->execute(['id' => $ticketPerduId]);
+        $nouvelId = $stmt->fetchColumn();
+
+        return $nouvelId === false ? null : (int) $nouvelId;
+    }
 }
