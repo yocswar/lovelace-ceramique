@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Toast from "../Toast/Toast";
 import "./Kanban.css";
+import TicketMenu from "../TicketMenu/TicketMenu";
 
 // Kanban d'une commande (US.14). On glisse une carte dans n'importe quelle colonne pour changer son étape (US.12).
 function Kanban({ commandeId }) {
@@ -14,6 +15,7 @@ function Kanban({ commandeId }) {
   const [colonneSurvolee, setColonneSurvolee] = useState(null); // colonne sous la souris pendant le glisser
   const [ticketPerdu, setTicketPerdu] = useState(null); // carte qui vient d'arriver en Perte : ouvre la modal
   const [ticketSelectionne, setTicketSelectionne] = useState(null);
+  const [ticketASupprimer, setTicketASupprimer] = useState(null); // US.16 : ticket en attente de confirmation de suppression
   const [utilisateurs, setUtilisateurs] = useState([]);
   const [utilisateurSelectionne, setUtilisateurSelectionne] = useState("");
   const [toast, setToast] = useState(null);
@@ -116,6 +118,33 @@ function Kanban({ commandeId }) {
     }
   }
 
+  // US.16 : suppression d'un ticket après confirmation dans la modal
+  async function supprimerTicket() {
+    try {
+      const response = await fetch("/api/tickets", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ id: ticketASupprimer.id }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Suppression impossible");
+      }
+
+      // La carte disparaît de la colonne sans recharger le Kanban
+      setTickets((prev) => prev.filter((ticket) => ticket.id !== ticketASupprimer.id));
+      showToast("success", data.message || "Ticket supprimé");
+    } catch (error) {
+      showToast("error", error.message);
+    } finally {
+      setTicketASupprimer(null);
+    }
+  }
+
   function finGlisser() {
     setTicketGlisse(null);
     setColonneSurvolee(null);
@@ -172,6 +201,18 @@ function Kanban({ commandeId }) {
         </div>
       )}
 
+      {ticketASupprimer && (
+        <div className="modal-fond">
+          <div className="modal" role="dialog" aria-modal="true">
+            <p>
+              Voulez-vous vraiment supprimer le ticket « {ticketASupprimer.piece} » ?
+            </p>
+            <button onClick={supprimerTicket}>Valider</button>
+            <button onClick={() => setTicketASupprimer(null)}>Annuler</button>
+          </div>
+        </div>
+      )}
+
       <div className="kanban">
         {etapes.map((etape) => {
           const cartes = tickets.filter((ticket) => ticket.etape_id === etape.id);
@@ -212,7 +253,20 @@ function Kanban({ commandeId }) {
                   }}
                   onDragEnd={finGlisser}
                 >
+                  <div className="kanban-carte-entete">
                   <p className="kanban-piece">{ticket.piece}</p>
+                    <TicketMenu
+                      actions={[
+                        {
+                          label: "Supprimer",
+                          icon: "🗑️",
+                          danger: true,
+                          onClick: () => setTicketASupprimer(ticket),
+                        },
+                        // Plus tard : { label: "Historique", icon: "🕓", onClick: () => ... },
+                      ]}
+                    />
+                  </div>
                   <p>
                     Commande n°{ticket.commande_id} · {ticket.nom_client}
                   </p>

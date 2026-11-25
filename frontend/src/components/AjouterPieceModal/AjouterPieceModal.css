@@ -1,0 +1,54 @@
+.modale-fond {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modale {
+  background: #fff;
+  color: #222;
+  border: 2px solid var(--couleur-principale);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: min(440px, 92vw);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modale h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.modale label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.modale input,
+.modale select {
+  padding: 0.5rem;
+  font: inherit;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.modale-erreur {
+  margin: 0;
+  color: #b00020;
+  font-size: 0.9rem;
+}
+
+.modale-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

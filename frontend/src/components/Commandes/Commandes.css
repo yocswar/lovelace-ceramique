@@ -40,3 +40,27 @@
 .chevron-bouton:hover {
   background: rgba(255, 255, 255, 0.15);
 }
+
+/* bouton « + » du header : à droite, à côté du titre de la commande */
+.ajout-piece-bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  min-width: 0;
+  height: 32px;
+  margin: 0 0 0 auto;
+  padding: 0;
+  background: none;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  color: inherit;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ajout-piece-bouton:hover {
+  background: rgba(255, 255, 255, 0.15);
+}

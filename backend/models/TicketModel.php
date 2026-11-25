@@ -8,8 +8,8 @@ namespace App\Models;
 
 use PDO;
 
-final class TicketModel
-{
+final class TicketModel {
+
     public function __construct(private PDO $pdo) {}
 
     // Les pièces des commandes encore actives (à faire ou en cours) : les cartes du Kanban (US.14).
@@ -25,7 +25,7 @@ final class TicketModel
              JOIN piece p ON p.id = ct.piece_id
              JOIN etape e ON e.id = ct.etape_id
              LEFT JOIN utilisateur u ON u.id = ct.utilisateur_id
-             WHERE c.statut IN ('a_faire', 'en_cours') AND c.id = :commande_id
+             WHERE c.statut IN ('a_faire', 'en_cours') AND c.id = :commande_id AND ct.deleted_at IS NULL
              ORDER BY e.ordre, c.id, ct.id"
         );
         $stmt->execute(['commande_id' => $commandeId]);
@@ -40,7 +40,7 @@ final class TicketModel
             'SELECT ct.id, ct.etape_id, e.ordre
              FROM commande_ticket ct
              JOIN etape e ON e.id = ct.etape_id
-             WHERE ct.id = :id'
+             WHERE ct.id = :id AND ct.deleted_at IS NULL'
         );
         $stmt->execute(['id' => $id]);
         $ticket = $stmt->fetch();
@@ -111,5 +111,83 @@ final class TicketModel
         $nouvelId = $stmt->fetchColumn();
 
         return $nouvelId === false ? null : (int) $nouvelId;
+    }
+
+    // US.16 : le ticket appartient-il à l'organisation de l'utilisateur connecté ?
+    // Même logique que verifierAssignation : on passe par le créateur de la commande.
+    public function appartientALOrganisation(int $ticketId, int $connecteId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT 1
+             FROM commande_ticket ct
+             JOIN commande c ON c.id = ct.commande_id
+             JOIN utilisateur createur ON createur.id = c.utilisateur_id
+             JOIN utilisateur connecte ON connecte.id = :connecte_id
+             WHERE ct.id = :ticket_id
+               AND createur.organisation_id = connecte.organisation_id'
+        );
+        $stmt->execute(['ticket_id' => $ticketId, 'connecte_id' => $connecteId]);
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    // US.16 : combien de tickets non supprimés reste-t-il dans la commande de ce ticket ?
+    public function compterActifsDeLaCommande(int $ticketId): int
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT COUNT(*)
+             FROM commande_ticket
+             WHERE deleted_at IS NULL
+               AND commande_id = (SELECT commande_id FROM commande_ticket WHERE id = :id)'
+        );
+        $stmt->execute(['id' => $ticketId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    // US.16 : suppression logique, la ligne reste en base (historique à venir)
+    public function supprimer(int $ticketId): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE commande_ticket SET deleted_at = NOW()
+             WHERE id = :id AND deleted_at IS NULL'
+        );
+        $stmt->execute(['id' => $ticketId]);
+    }
+
+    // Ajout d'une pièce : la commande appartient-elle à l'organisation de l'utilisateur connecté ?
+    // Même logique que appartientALOrganisation : on passe par le créateur de la commande.
+    public function commandeAppartientALOrganisation(int $commandeId, int $connecteId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT 1
+             FROM commande c
+             JOIN utilisateur createur ON createur.id = c.utilisateur_id
+             JOIN utilisateur connecte ON connecte.id = :connecte_id
+             WHERE c.id = :commande_id
+               AND createur.organisation_id = connecte.organisation_id'
+        );
+        $stmt->execute(['commande_id' => $commandeId, 'connecte_id' => $connecteId]);
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    // Ajout d'une pièce : crée $quantite tickets (1 ticket = 1 pièce) dans la première étape (« À faire »),
+    // sans artisan assigné. Un seul INSERT ... SELECT : tout est créé ou rien (pas de demi-commande).
+    // Renvoie les ids des tickets créés.
+    public function creerPlusieurs(int $commandeId, int $pieceId, int $quantite): array
+    {
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO commande_ticket (piece_id, commande_id, etape_id)
+             SELECT :piece_id, :commande_id, (SELECT id FROM etape ORDER BY ordre LIMIT 1)
+             FROM generate_series(1, CAST(:quantite AS INTEGER))
+             RETURNING id'
+        );
+        $stmt->bindValue('piece_id', $pieceId, PDO::PARAM_INT);
+        $stmt->bindValue('commande_id', $commandeId, PDO::PARAM_INT);
+        $stmt->bindValue('quantite', $quantite, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
     }
 }
