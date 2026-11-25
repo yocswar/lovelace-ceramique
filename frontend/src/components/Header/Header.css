@@ -1,0 +1,91 @@
+/* HEADER POTTERPILOT */
+.pp-header {
+    width: 100%;
+    min-height: 77px;
+    margin: 0;
+    gap: 20px;
+    background-color: var(--couleur-principale);
+    color: var(--couleur-contour-clair);
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+.main {
+    padding: 0 24px 0 27px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* LOGO */
+
+.header_logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: color var(--transition);
+}
+
+.header_logo svg {
+    height: 54px;
+}
+
+.header_logo h1 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: inherit;
+}
+
+.header_logo:hover {
+    color: white;
+}
+
+.header_nav {
+    display: flex;
+    align-items: center;
+    gap: 29px;
+}
+
+.header_user {
+    color: inherit;
+    white-space: nowrap;
+}
+
+.header_separator {
+    width: 2px;
+    height: 34px;
+    flex-shrink: 0;
+    background-color: #dcc3aa;
+}
+
+
+
+/* RESPONSIVE */
+@media (max-width: 650px) {
+    .pp-header {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .header_nav {
+        width: 100%;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .pp-header .header_button {
+        min-width: 0;
+        padding: 0 6px;
+    }
+
+    .header_separator {
+        width: 1px;
+        height: 25px;
+    }
+}

@@ -1,101 +1,146 @@
+/* ==========================================================================
+   FormulaireConnexion.css : mise en page propre à l'écran de connexion
+   Les couleurs, champs et boutons viennent de global.css
+   ========================================================================== */
+
+/* Page : centre la carte au milieu de l'écran */
+.fc-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espace-3);
+}
+
+/* Carte brune */
 .fc-form {
-  --fc-encre: #14213d;
-  --fc-doux: #55607a;
-  --fc-bord: #b9c2d3;
-  --fc-fond: #ffffff;
-  --fc-accent: #2347d9;
-  --fc-accent-fonce: #1a36a8;
-  --fc-erreur: #a8201a;
-  --fc-erreur-fond: #fdecea;
-
-  box-sizing: border-box;
   width: 100%;
-  max-width: 24rem;
-  margin: 0 auto;
-  padding: 2rem 1.75rem;
-  background: var(--fc-fond);
-  color: var(--fc-encre);
-  border: 1px solid var(--fc-bord);
-  border-radius: 10px;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.5;
-}
-.fc-form *, .fc-form *::before, .fc-form *::after { box-sizing: inherit; }
-
-.fc-titre { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
-.fc-sous-titre { margin: 0.25rem 0 1.5rem; color: var(--fc-doux); font-size: 0.95rem; }
-
-.fc-erreur {
-  margin-bottom: 1.25rem;
-  padding: 0.75rem 0.9rem;
-  background: var(--fc-erreur-fond);
-  color: var(--fc-erreur);
-  border-left: 3px solid var(--fc-erreur);
-  border-radius: 4px;
-  font-size: 0.9rem;
+  max-width: 23.5rem; /* ≈ 378px dans la maquette */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espace-3);
+  padding: var(--espace-4) 2rem 2.25rem;
+  background-color: var(--couleur-principale);
+  color: var(--couleur-texte-clair);
+  border-radius: var(--rayon-carte);
+  margin-top: 60px;
 }
 
-.fc-champ { margin-bottom: 1.1rem; }
-.fc-champ label { display: block; margin-bottom: 0.35rem; font-size: 0.9rem; font-weight: 600; }
-
-.fc-form input {
-  width: 100%;
-  padding: 0.65rem 0.8rem;
-  font: inherit;
-  color: inherit;
-  background: #fff;
-  border: 1px solid var(--fc-bord);
-  border-radius: 6px;
-}
-.fc-form input[aria-invalid="true"] { border-color: var(--fc-erreur); }
-.fc-form input:disabled { background: #f1f3f7; cursor: not-allowed; }
-
-.fc-mdp { position: relative; }
-.fc-mdp input { padding-right: 5.25rem; }
-.fc-afficher {
-  position: absolute;
-  top: 50%;
-  right: 0.4rem;
-  transform: translateY(-50%);
-  padding: 0.3rem 0.6rem;
-  font: inherit;
-  font-size: 0.85rem;
-  color: var(--fc-accent);
-  background: transparent;
-  border: 0;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.fc-afficher:hover { text-decoration: underline; }
-
-.fc-form input:focus-visible,
-.fc-afficher:focus-visible,
-.fc-envoyer:focus-visible,
-.fc-lien:focus-visible {
-  outline: 3px solid var(--fc-accent);
-  outline-offset: 2px;
+/* Bloc marque : logo + nom de l'application */
+.fc-marque {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.fc-envoyer {
-  width: 100%;
-  margin-top: 0.4rem;
-  padding: 0.75rem 1rem;
-  font: inherit;
-  font-weight: 600;
-  color: #fff;
-  background: var(--fc-accent);
-  border: 0;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.fc-envoyer:hover:not(:disabled) { background: var(--fc-accent-fonce); }
-.fc-envoyer:disabled { opacity: 0.7; cursor: progress; }
-
-.fc-lien {
+.fc-logo {
   display: block;
-  margin-top: 1.1rem;
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--fc-doux);
+  width: auto;
+  height: 280px;
+  color: var(--couleur-principale); /* beige clair : lisible sur le fond brun */
 }
-.fc-lien:hover { color: var(--fc-encre); }
+
+.fc-nom-appli {
+  font-family: var(--police-marque);
+  font-size: 3.75rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--couleur-principale);
+}
+
+/* Titre */
+.fc-titre {
+  font-size: var(--taille-titre);
+  font-weight: 400;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--couleur-texte-clair);
+}
+
+/* Sous-titre (masqué visuellement : absent de la maquette, conservé pour les lecteurs d'écran) */
+.fc-sous-titre {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+/* Message d'erreur */
+.fc-erreur {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--couleur-erreur-fond);
+  color: var(--couleur-erreur-texte);
+  border-radius: var(--rayon-champ);
+  font-size: var(--taille-petit);
+  line-height: 1.4;
+}
+
+/* Groupe label + champ */
+.fc-champ {
+  width: 100%;
+}
+
+/* Les labels restent dans le DOM (accessibilité) mais le placeholder joue
+   le rôle de libellé visuel, comme dans la maquette. */
+.fc-champ > label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.fc-mdp {
+  position: relative;
+  width: 100%;
+}
+
+/* Espace entre les deux champs (légèrement plus aéré que le gap de la carte) */
+.fc-champ + .fc-champ {
+  margin-top: 0.5rem;
+}
+
+/* Zone des boutons */
+.fc-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Bouton principal : hérite de .btn .btn--contour (global.css) */
+.fc-envoyer {
+  min-width: 10rem;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 30rem) {
+  .fc-page {
+    padding: var(--espace-2);
+  }
+
+  .fc-logo {
+    height: 5.5rem;
+  }
+
+  .fc-form {
+    padding: 2rem 1.25rem;
+    border-radius: 1.25rem;
+  }
+
+  .fc-actions,
+  .fc-actions .btn {
+    width: 100%;
+  }
+}
