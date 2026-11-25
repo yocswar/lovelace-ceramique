@@ -23,3 +23,4 @@ Ce document regroupe la priorisation des fonctionnalités du projet. Le périmè
 - Gestion des stocks de matières premières (**Won't have**).
 - Gestion des commandes et des livraisons (**Won't have**, à confirmer).
 - Calendrier et priorisation des commandes (**Should have**, mais actuellement classé hors V1 : périmètre à clarifier en équipe).
+.

@@ -365,3 +365,4 @@ Exemples : « Afficher le catalogue des pièces » → `feature/catalogue-pieces
 ## 9. ADR — Décisions d'architecture
 
 Les décisions d'architecture du projet sont documentées dans le fichier [ADR.md](docs/ADR.md).
+.
