@@ -43,6 +43,17 @@ final class TicketView
         ]);
     }
     
+    // Ajout d'une pièce : 201 = créé ; React recharge le Kanban de la commande
+    public function ticketsCrees(array $ids): void
+    {
+        $nb = count($ids);
+        $this->send(201, [
+            'status' => 'ok',
+            'message' => $nb . ' pièce(s) ajoutée(s) dans À faire',
+            'ticket_ids' => $ids,
+        ]);
+    }
+
     // Toutes les erreurs passent par ici, avec un message lisible (jamais le détail technique)
     public function error(int $code, string $message): void
     {

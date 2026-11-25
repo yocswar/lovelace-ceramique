@@ -83,6 +83,21 @@ switch ($path) {
         }
 
         break;
+        
+    case '/api/tickets/ajout':
+        $controller = new TicketController();
+ 
+        if ($method === 'POST') {
+            $controller->creer();
+        } else {
+            http_response_code(405);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Méthode non autorisée'
+            ]);
+        }
+ 
+        break;
 
     // Création de commande : le catalogue de pièces alimente la liste déroulante du formulaire
     case '/api/pieces':

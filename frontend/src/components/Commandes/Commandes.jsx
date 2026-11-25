@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { getToken } from "../FormulaireConnexion/FormulaireConnexion";
 import Kanban from "../Kanban/Kanban";
 import Chevron from "../Chevron/Chevron";
+import AjouterPieceModal from "../AjouterPieceModal/AjouterPieceModal";
 import "./Commandes.css";
 
 function affichageStatut(statut) {
@@ -21,9 +22,18 @@ function Commandes() {
   const [chargement, setChargement] = useState(true);
   const [plies, setPlies] = useState({}); // { 17: true, 18: false, ... }
   const [message, setMessage] = useState("");
+  const [commandeModale, setCommandeModale] = useState(null); // commande pour laquelle la modale « + » est ouverte
+  const [versions, setVersions] = useState({}); // { 17: 2, ... } sert à recharger le Kanban d'une commande
 
   function togglePlie(id) {
     setPlies((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
+
+  // Après l'ajout d'une pièce : on déplie la commande et on recharge son Kanban
+  // (changer la key de <Kanban> le remonte, donc il refait son fetch sans modifier Kanban.jsx)
+  function pieceAjoutee(commandeId) {
+    setPlies((prev) => ({ ...prev, [commandeId]: false }));
+    setVersions((prev) => ({ ...prev, [commandeId]: (prev[commandeId] ?? 0) + 1 }));
   }
 
   useEffect(() => {
@@ -83,13 +93,30 @@ function Commandes() {
             <h2>
               Commande n°{commande.id} - {commande.nom_client} - {affichageStatut(commande.statut)}
             </h2>
+            <button
+              type="button"
+              className="ajout-piece-bouton"
+              onClick={() => setCommandeModale(commande)}
+              aria-label={"Ajouter une pièce à la commande n°" + commande.id}
+              title="Ajouter une pièce"
+            >
+              +
+            </button>
           </header>
 
           <div style={{ display: plies[commande.id] ? "none" : "block" }}>
-            <Kanban commandeId={commande.id} />
+            <Kanban key={versions[commande.id] ?? 0} commandeId={commande.id} />
           </div>
         </article>
       ))}
+
+      {commandeModale && (
+        <AjouterPieceModal
+          commande={commandeModale}
+          onClose={() => setCommandeModale(null)}
+          onCreated={() => pieceAjoutee(commandeModale.id)}
+        />
+      )}
     </section>
   );
 }

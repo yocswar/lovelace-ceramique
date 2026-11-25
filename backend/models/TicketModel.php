@@ -154,4 +154,40 @@ final class TicketModel {
         );
         $stmt->execute(['id' => $ticketId]);
     }
+
+    // Ajout d'une pièce : la commande appartient-elle à l'organisation de l'utilisateur connecté ?
+    // Même logique que appartientALOrganisation : on passe par le créateur de la commande.
+    public function commandeAppartientALOrganisation(int $commandeId, int $connecteId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT 1
+             FROM commande c
+             JOIN utilisateur createur ON createur.id = c.utilisateur_id
+             JOIN utilisateur connecte ON connecte.id = :connecte_id
+             WHERE c.id = :commande_id
+               AND createur.organisation_id = connecte.organisation_id'
+        );
+        $stmt->execute(['commande_id' => $commandeId, 'connecte_id' => $connecteId]);
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    // Ajout d'une pièce : crée $quantite tickets (1 ticket = 1 pièce) dans la première étape (« À faire »),
+    // sans artisan assigné. Un seul INSERT ... SELECT : tout est créé ou rien (pas de demi-commande).
+    // Renvoie les ids des tickets créés.
+    public function creerPlusieurs(int $commandeId, int $pieceId, int $quantite): array
+    {
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO commande_ticket (piece_id, commande_id, etape_id)
+             SELECT :piece_id, :commande_id, (SELECT id FROM etape ORDER BY ordre LIMIT 1)
+             FROM generate_series(1, CAST(:quantite AS INTEGER))
+             RETURNING id'
+        );
+        $stmt->bindValue('piece_id', $pieceId, PDO::PARAM_INT);
+        $stmt->bindValue('commande_id', $commandeId, PDO::PARAM_INT);
+        $stmt->bindValue('quantite', $quantite, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+    }
 }
