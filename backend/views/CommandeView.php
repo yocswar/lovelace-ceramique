@@ -27,6 +27,15 @@ final class CommandeView
         ]);
     }
 
+    public function finalisee(int $commandeId): void
+    {
+        $this->send(200, [
+            'status' => 'ok',
+            'message' => 'Commande finalisée avec succès',
+            'commande_id' => $commandeId
+        ]);
+    }
+
     public function error(int $code, string $message): void
     {
         $this->send($code, ['status' => 'error', 'message' => $message]);

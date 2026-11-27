@@ -3,7 +3,7 @@ import Toast from "../Toast/Toast";
 import "./Kanban.css";
 
 // Kanban d'une commande (US.14). On glisse une carte dans n'importe quelle colonne pour changer son étape (US.12).
-function Kanban({ commandeId, titre }) {
+function Kanban({ commandeId, titre, actualiserStatut, statut }) {
   const [etapes, setEtapes] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +17,7 @@ function Kanban({ commandeId, titre }) {
   const [utilisateurs, setUtilisateurs] = useState([]);
   const [utilisateurSelectionne, setUtilisateurSelectionne] = useState("");
   const [toast, setToast] = useState(null);
+  const [modalFinalisation, setModalFinalisation] = useState(false);
 
   const showToast = (type, message) => {
     setToast({ type, message });
@@ -79,6 +80,9 @@ function Kanban({ commandeId, titre }) {
           ticket.id === ticketId ? { ...ticket, etape_id: data.etape.id } : ticket,
         ),
       );
+
+      actualiserStatut(commandeId, data.statut_commande);
+
       showToast("success", data.message);
       // US.13 : on se fie à la réponse du back, qui connaît le vrai nom de l'étape
       if (data.etape.nom === "Perte") {
@@ -88,6 +92,30 @@ function Kanban({ commandeId, titre }) {
       showToast("error", error.message);
     } finally {
       setEnCours(null);
+    }
+  }
+
+  async function finaliserCommande() {
+    try {
+      const response = await fetch("/api/commandes", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token")
+        },
+        body: JSON.stringify({ id: commandeId })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      actualiserStatut(commandeId, "terminee");
+
+    } catch (error) {
+      showToast("error", error.message);
     }
   }
 
@@ -108,6 +136,9 @@ function Kanban({ commandeId, titre }) {
       // etapes[0] = "À faire", car le back renvoie les étapes triées par ordre.
       const nouvelleCarte = { ...ticketPerdu, id: data.ticket_id, etape_id: etapes[0].id, artisan: null };
       setTickets((prev) => [...prev, nouvelleCarte]);
+
+      actualiserStatut(commandeId, "en_cours");
+
       showToast("success", data.message);
     } catch (error) {
       showToast("error", error.message);
@@ -181,6 +212,14 @@ function Kanban({ commandeId, titre }) {
 
   const progressionCommande = calculerProgressionCommande();
 
+  const etapePerte = etapes.find(
+    (etape) => etape.nom === "Perte"
+  );
+
+  const nombreTicketsPerdus = tickets.filter(
+    (ticket) => ticket.etape_id === etapePerte?.id
+  ).length;
+
   if (loading) {
     return <p>Chargement de l&apos;atelier…</p>;
   }
@@ -197,11 +236,54 @@ function Kanban({ commandeId, titre }) {
           />
           <span>{Math.round(progressionCommande)}%</span>
         </div>
+
+        {statut === "a_finaliser" && (
+          <button
+            className="bouton-finaliser"
+            type="button"
+            onClick={() => setModalFinalisation(true)}
+          >
+            Finaliser la commande
+          </button>
+        )}
       </header>
       {message && (
         <p role="status" className={`connection-message ${status}`}>
           {message}
         </p>
+      )}
+
+      {modalFinalisation && (
+        <div className="modal-fond">
+          <div className="modal" role="dialog" aria-modal="true">
+            <h3>Finaliser la commande</h3>
+
+            <p>Voulez-vous vraiment finaliser cette commande ?</p>
+
+            {nombreTicketsPerdus > 0 && (
+              <p className="avertissement-perte">
+                Attention : cette commande contient {nombreTicketsPerdus}
+                {" "}pièce(s) perdue(s).
+              </p>
+            )}
+
+            <p>
+              Une fois finalisée, cette commande ne sera
+              plus visible dans la liste des commandes actives.
+            </p>
+
+            <button type="button" onClick={finaliserCommande}>
+              Confirmer
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setModalFinalisation(false)}
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
       )}
 
       {ticketPerdu && (

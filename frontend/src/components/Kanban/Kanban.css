@@ -120,3 +120,25 @@
 .modal button:hover {
   background: #74330f;
 }
+
+.avertissement-perte {
+    color: #b45309;
+    font-weight: bold;
+    background-color: #fff3cd;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.bouton-finaliser {
+    background-color: transparent;
+    color: #e5d6c1;
+    border: 1px solid #e5d6c1;
+    border-radius: 6px;
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+.bouton-finaliser:hover {
+    background-color: #e5d6c1;
+    color: var(--couleur-principale);
+}

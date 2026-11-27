@@ -8,10 +8,11 @@ CREATE TYPE "role" AS ENUM (
 -- Statut d'une commande : valeurs sans accent pour simplifier le PHP,
 -- l'affichage (« À faire », « En cours »…) est géré côté React
 CREATE TYPE "statut_commande" AS ENUM (
-	'a_faire',
-	'en_cours',
-	'terminee',
-	'livree'
+    'a_faire',
+    'en_cours',
+    'a_finaliser',
+    'terminee',
+    'livree'
 );
 
 CREATE TABLE IF NOT EXISTS "utilisateur" (

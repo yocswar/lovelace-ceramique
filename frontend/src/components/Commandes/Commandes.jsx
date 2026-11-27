@@ -46,6 +46,24 @@ function Commandes() {
         chargerCommande();
     }, [])
 
+    // Actualiser le statut d'une commande
+    function actualiserStatut(commandeId, nouveauStatut) {
+
+        if (nouveauStatut === "terminee") {
+            setCommandes((prev) =>
+                prev.filter((commande) => commande.id !== commandeId)
+            );
+            return;
+        }
+
+        setCommandes((prev) =>
+            prev.map((commande) =>
+                commande.id === commandeId
+                    ? { ...commande, statut: nouveauStatut }
+                    : commande
+            )
+        );
+    }
 
     return (
         <>
@@ -59,6 +77,8 @@ function Commandes() {
                         <Kanban
                             commandeId={commande.id}
                             titre={`Commande n°${commande.id} - ${commande.nom_client} - ${affichageStatut(commande.statut)}`}
+                            actualiserStatut={actualiserStatut}
+                            statut={commande.statut}
                         />
 
                     </article>
@@ -71,11 +91,11 @@ function Commandes() {
 function affichageStatut(statut) {
     switch (statut) {
         case "a_faire":
-            return "À faire"
-            break;
+            return "À faire";
         case "en_cours":
-            return "En cours"
-            break;
+            return "En cours";
+        case "a_finaliser":
+            return "À finaliser";
     }
 }
 

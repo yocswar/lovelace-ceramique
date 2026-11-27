@@ -22,7 +22,7 @@ final class CommandeModel
                 "SELECT c.id,c.nom_client, c.statut
                 FROM commande c
                 JOIN utilisateur u on u.id = c.utilisateur_id
-                WHERE c.statut IN ('a_faire', 'en_cours')
+                WHERE c.statut IN ('a_faire', 'en_cours', 'a_finaliser')
                 AND u.organisation_id = :orga_id
                 ORDER BY c.date_creation"
             );
@@ -33,6 +33,55 @@ final class CommandeModel
         } catch (Throwable $e) {
             throw $e; // le contrôleur loggue et répond 500
         }
+    }
+
+    public function updateStatut(int $commandeId, string $statut): void
+    {
+        $stmt = $this->pdo->prepare(
+            "UPDATE commande
+            SET statut = :statut
+            WHERE id = :id
+            AND statut IN ('a_faire', 'en_cours', 'a_finaliser')"
+        );
+
+        $stmt->execute([
+            'statut' => $statut,
+            'id' => $commandeId
+        ]);
+    }
+
+    public function finaliserCommande(int $commandeId, int $utilisateurId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            "UPDATE commande c
+            SET statut = 'terminee'
+            WHERE c.id = :commande_id
+            AND c.statut = 'a_finaliser'
+            AND c.utilisateur_id IN (
+                SELECT id FROM utilisateur
+                WHERE organisation_id = (
+                    SELECT organisation_id FROM utilisateur
+                    WHERE id = :utilisateur_id
+                )
+            )
+            AND EXISTS (
+                SELECT 1 FROM commande_ticket ct
+                WHERE ct.commande_id = c.id
+            )
+            AND NOT EXISTS (
+                SELECT 1 FROM commande_ticket ct
+                JOIN etape e ON e.id = ct.etape_id
+                WHERE ct.commande_id = c.id
+                AND e.nom NOT IN ('Terminé', 'Perte')
+            )"
+        );
+
+        $stmt->execute([
+            'commande_id' => $commandeId,
+            'utilisateur_id' => $utilisateurId
+        ]);
+
+        return $stmt->rowCount() > 0;
     }
 
     // La première étape du circuit (ordre le plus petit) : c'est là que démarre chaque nouveau ticket.
