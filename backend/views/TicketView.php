@@ -14,13 +14,14 @@ final class TicketView
     }
 
     // US.12 : confirme le changement et renvoie la nouvelle étape, pour que React déplace la carte
-    public function etapeChangee(int $ticketId, array $etape): void
+    public function etapeChangee(int $ticketId, array $etape, string $statutCommande): void
     {
         $this->send(200, [
             'status' => 'ok',
             'message' => 'Pièce passée à l\'étape : ' . $etape['nom'],
             'ticket_id' => $ticketId,
             'etape' => $etape,
+            'statut_commande' => $statutCommande,
         ]);
     }
 

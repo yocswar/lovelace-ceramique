@@ -126,4 +126,33 @@ final class CommandeController
             $this->view->error(500, 'Impossible de créer la commande');
         }
     }
+
+    public function finaliser(): void
+    {
+        $utilisateur = JwtAuth::utilisateurConnecte();
+
+        if ($utilisateur === null) {
+            $this->view->error(401, 'Authentification requise');
+            return;
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $commandeId = (int) ($data['id'] ?? 0);
+
+        try {
+            $pdo = require __DIR__ . '/../config/db.php';
+            $commandeModel = new CommandeModel($pdo);
+
+            if (!$commandeModel->finaliserCommande($commandeId, (int) $utilisateur['sub'])) {
+                $this->view->error(400, 'Impossible de finaliser la commande');
+                return;
+            }
+
+            $this->view->finalisee($commandeId);
+
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            $this->view->error(500, 'Erreur lors de la finalisation');
+        }
+    }
 }

@@ -25,7 +25,7 @@ final class TicketModel {
              JOIN piece p ON p.id = ct.piece_id
              JOIN etape e ON e.id = ct.etape_id
              LEFT JOIN utilisateur u ON u.id = ct.utilisateur_id
-             WHERE c.statut IN ('a_faire', 'en_cours') AND c.id = :commande_id AND ct.deleted_at IS NULL
+             WHERE c.statut IN ('a_faire', 'en_cours', 'a_finaliser') AND c.id = :commande_id AND ct.deleted_at IS NULL
              ORDER BY e.ordre, c.id, ct.id"
         );
         $stmt->execute(['commande_id' => $commandeId]);
@@ -37,7 +37,7 @@ final class TicketModel {
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT ct.id, ct.etape_id, e.ordre
+            'SELECT ct.id, ct.etape_id, ct.commande_id, e.ordre
              FROM commande_ticket ct
              JOIN etape e ON e.id = ct.etape_id
              WHERE ct.id = :id AND ct.deleted_at IS NULL'
@@ -53,6 +53,26 @@ final class TicketModel {
     {
         $stmt = $this->pdo->prepare('UPDATE commande_ticket SET etape_id = :etape_id WHERE id = :id');
         $stmt->execute(['etape_id' => $etapeId, 'id' => $ticketId]);
+    }
+
+    public function verifTicketsFinalises(int $commandeId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT COUNT(*) AS total,
+                    COUNT(*) FILTER (
+                        WHERE e.nom NOT IN ('Terminé', 'Perte')
+                    ) AS restants
+            FROM commande_ticket ct
+            JOIN etape e ON e.id = ct.etape_id
+            WHERE ct.commande_id = :commande_id"
+        );
+
+        $stmt->execute(['commande_id' => $commandeId]);
+
+        $resultat = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return (int) $resultat['total'] > 0
+            && (int) $resultat['restants'] === 0;
     }
 
     public function assignerUtilisateur(int $ticketId, ?int $utilisateurId): void

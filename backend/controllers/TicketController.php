@@ -12,7 +12,9 @@ namespace App\Controllers;
 use App\Models\EtapeModel;
 use App\Models\PieceModel;
 use App\Models\TicketModel;
+use App\Models\CommandeModel;
 use App\Views\TicketView;
+
 use PDO;
 use Throwable;
 
@@ -65,20 +67,37 @@ final class TicketController
             $ticketModel = new TicketModel($pdo);
             $etapeModel = new EtapeModel($pdo);
 
-            if ($ticketModel->findById($id) === null) {
+            $ticket = $ticketModel->findById($id);
+
+            if ($ticket === null) {
                 $this->view->error(404, 'Ticket introuvable');
                 return;
             }
 
+            $commandeId = (int) $ticket['commande_id'];
+
             // On vérifie l'étape avant d'écrire : un id inventé donnerait sinon une erreur 500 de la base
             $etape = $etapeModel->findById($etapeId);
+
             if ($etape === null) {
                 $this->view->error(404, 'Étape introuvable');
                 return;
             }
 
             $ticketModel->updateEtape($id, $etapeId);
-            $this->view->etapeChangee($id, $etape);
+
+            $commandeModel = new CommandeModel($pdo);
+
+            // Vérifier si tous les tickets de la commande sont terminés ou perdus
+            if ($ticketModel->verifTicketsFinalises($commandeId)) {
+                $statutCommande = 'a_finaliser';
+            } else {
+                $statutCommande = 'en_cours';
+            }
+
+            $commandeModel->updateStatut($commandeId, $statutCommande);
+
+            $this->view->etapeChangee($id, $etape, $statutCommande);
         } catch (Throwable $e) {
             error_log($e->getMessage());
             $this->view->error(500, 'Impossible de changer l\'étape');
@@ -92,16 +111,31 @@ final class TicketController
         $ticketPerduId = (int) ($data['ticket_id'] ?? 0);
 
         try {
-            /** @var PDO $pdo */
             $pdo = require __DIR__ . '/../config/db.php';
-            $nouvelId = (new TicketModel($pdo))->recreer($ticketPerduId);
+
+            $ticketModel = new TicketModel($pdo);
+
+            $ticket = $ticketModel->findById($ticketPerduId);
+
+            if ($ticket === null) {
+                $this->view->error(404, 'Ticket introuvable');
+                return;
+            }
+
+            $nouvelId = $ticketModel->recreer($ticketPerduId);
 
             if ($nouvelId === null) {
                 $this->view->error(404, 'Ticket introuvable');
                 return;
             }
 
+            $commandeId = (int) $ticket['commande_id'];
+
+            $commandeModel = new CommandeModel($pdo);
+            $commandeModel->updateStatut($commandeId, 'en_cours');
+
             $this->view->ticketRecree($nouvelId);
+
         } catch (Throwable $e) {
             error_log($e->getMessage());
             $this->view->error(500, 'Impossible de recréer la pièce');
@@ -153,7 +187,6 @@ final class TicketController
 
             // Enregistrer l'assignation
             $ticketModel->assignerUtilisateur($ticketId, $utilisateurId);
-
 
             header('Content-Type: application/json');
             echo json_encode(['message' => 'Assignation enregistrée']);

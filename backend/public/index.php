@@ -126,6 +126,9 @@ switch ($path) {
             case 'POST':
                 $controller->creer();
                 break;
+            case 'PATCH':
+                $controller->finaliser();
+                break;
             default:
                 http_response_code(405);
                 echo json_encode([
