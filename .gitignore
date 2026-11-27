@@ -1,6 +1,23 @@
+# Secrets et configuration locale
 .env
-.DS_Store
+.env.*
+!.env.example
+
+# Dépendances
 vendor/
+node_modules/
+
+# Build frontend
+dist/
+dist-ssr/
+
+# Logs et caches
 *.log
 *.cache
 backend/.phpunit.result.cache
+
+# Système et éditeurs
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
