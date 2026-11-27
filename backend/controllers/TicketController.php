@@ -218,7 +218,9 @@ final class TicketController
             $pdo = require __DIR__ . '/../config/db.php';
             $ticketModel = new TicketModel($pdo);
 
-            if ($ticketModel->findById($id) === null) {
+            $ticket = $ticketModel->findById($id);
+
+            if ($ticket === null) {
                 $this->view->error(404, 'Ticket introuvable');
                 return;
             }
@@ -236,7 +238,15 @@ final class TicketController
             }
 
             $ticketModel->supprimer($id);
-            $this->view->ticketSupprime($id);
+            $commandeId = (int) $ticket['commande_id'];
+            if ($ticketModel->verifTicketsFinalises($commandeId)) {
+                $statutCommande = 'a_finaliser';
+            } else {
+                $statutCommande = 'en_cours';
+            }
+            $commandeModel = new CommandeModel($pdo);
+            $commandeModel->updateStatut($commandeId, $statutCommande);
+            $this->view->ticketSupprime($id, $statutCommande);
         } catch (Throwable $e) {
             error_log($e->getMessage());
             $this->view->error(500, 'Impossible de supprimer le ticket');
@@ -285,7 +295,10 @@ final class TicketController
                 return;
             }
 
-            $this->view->ticketsCrees($ticketModel->creerPlusieurs($commandeId, $pieceId, $quantite));
+            $ids = $ticketModel->creerPlusieurs($commandeId, $pieceId, $quantite);
+            $commandeModel = new CommandeModel($pdo);
+            $commandeModel->updateStatut($commandeId, 'en_cours');
+            $this->view->ticketsCrees($ids);
         } catch (Throwable $e) {
             error_log($e->getMessage());
             $this->view->error(500, 'Impossible d\'ajouter la pièce');

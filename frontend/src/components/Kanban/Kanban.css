@@ -141,6 +141,8 @@
 .bouton-finaliser:hover {
     background-color: #e5d6c1;
     color: var(--couleur-principale);
+}
+
 .kanban-carte-entete {
   display: flex;
   justify-content: space-between;

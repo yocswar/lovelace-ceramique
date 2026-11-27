@@ -1,74 +1,68 @@
 .commande-section {
-    width: 100%;
-    box-sizing: border-box;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .commande-carte {
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid var(--couleur-principale);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--couleur-principale);
 }
 
 .commande-header {
-    background: var(--couleur-principale);
-    color: white;
-    padding: 1rem 1.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.commande-header h2 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.progression-commande {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.progression-commande progress {
-    width: 250px;
-    height: 10px;
-    appearance: none;
-    border: 1px solid #e5d6c1;
-    border-radius: 20px;
-    overflow: hidden;
-    background: transparent;
-}
-
-.progression-commande progress::-webkit-progress-bar {
-    background: transparent;
-}
-
-.progression-commande progress::-webkit-progress-value {
-    background: #e5d6c1;
-    border-radius: 20px;
-}
-
-.progression-commande progress::-moz-progress-bar {
-    background: #e5d6c1;
-    border-radius: 20px;
-}
-
-.progression-commande span {
-    color: #e5d6c1;
-    font-size: 14px;
-}
   background: var(--couleur-principale);
   color: white;
   padding: 1rem 1.25rem;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 20px;
 }
+
+.commande-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.progression-commande {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progression-commande progress {
+  width: 250px;
+  height: 10px;
+  appearance: none;
+  border: 1px solid #e5d6c1;
+  border-radius: 20px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.progression-commande progress::-webkit-progress-bar {
+  background: transparent;
+}
+
+.progression-commande progress::-webkit-progress-value {
+  background: #e5d6c1;
+  border-radius: 20px;
+}
+
+.progression-commande progress::-moz-progress-bar {
+  background: #e5d6c1;
+  border-radius: 20px;
+}
+
+.progression-commande span {
+  color: #e5d6c1;
+  font-size: 14px;
+}
+
 /* modification du logo de repli et dépli*/
 .chevron-bouton {
   display: inline-flex;
