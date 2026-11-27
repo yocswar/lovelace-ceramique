@@ -2,12 +2,15 @@
 // Contrôleur des tickets : reçoit la requête, vérifie la méthode, demande aux modèles, répond via la vue.
 // GET   /api/tickets                      → US.14 (voir les commandes à faire)
 // PATCH /api/tickets/{id}/etape-suivante  → US.12 (passer la pièce à l'étape suivante)
+// DELETE /api/tickets                     → US.16 (supprimer un ticket)
+// POST  /api/tickets/ajout                → ajout d'une pièce (quantité) à une commande, bouton « + »
 
 declare(strict_types=1);
 
 namespace App\Controllers;
 
 use App\Models\EtapeModel;
+use App\Models\PieceModel;
 use App\Models\TicketModel;
 use App\Models\CommandeModel;
 use App\Views\TicketView;
@@ -17,6 +20,9 @@ use Throwable;
 
 final class TicketController
 {
+    // Garde-fou : évite de créer des milliers de tickets par erreur de saisie
+    private const QUANTITE_MAX = 50;
+
     private TicketView $view;
 
     public function __construct()
@@ -187,6 +193,102 @@ final class TicketController
         } catch (Throwable $e) {
             error_log($e->getMessage());
             $this->view->error(500, 'Erreur lors de l’assignation');
+        }
+    }
+        // US.16 : supprime un ticket (suppression logique) après confirmation côté React
+    public function supprimer(): void
+    {
+        $connecte = \App\Services\JwtAuth::utilisateurConnecte();
+
+        if ($connecte === null) {
+            $this->view->error(401, 'Non connecté');
+            return;
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = (int) ($data['id'] ?? 0);
+
+        if ($id <= 0) {
+            $this->view->error(400, 'Identifiant invalide');
+            return;
+        }
+
+        try {
+            /** @var PDO $pdo */
+            $pdo = require __DIR__ . '/../config/db.php';
+            $ticketModel = new TicketModel($pdo);
+
+            if ($ticketModel->findById($id) === null) {
+                $this->view->error(404, 'Ticket introuvable');
+                return;
+            }
+
+            // Le ticket doit appartenir à l'organisation de l'utilisateur connecté
+            if (!$ticketModel->appartientALOrganisation($id, (int) $connecte['sub'])) {
+                $this->view->error(403, 'Suppression non autorisée');
+                return;
+            }
+
+            // Une commande doit garder au moins un ticket
+            if ($ticketModel->compterActifsDeLaCommande($id) <= 1) {
+                $this->view->error(409, 'Impossible de supprimer le dernier ticket de la commande');
+                return;
+            }
+
+            $ticketModel->supprimer($id);
+            $this->view->ticketSupprime($id);
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            $this->view->error(500, 'Impossible de supprimer le ticket');
+        }
+    }
+
+    // Ajout d'une pièce : crée N tickets « À faire » dans une commande existante (bouton « + » du header)
+    public function creer(): void
+    {
+        $connecte = \App\Services\JwtAuth::utilisateurConnecte();
+
+        if ($connecte === null) {
+            $this->view->error(401, 'Non connecté');
+            return;
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $commandeId = (int) ($data['commande_id'] ?? 0);
+        $pieceId = (int) ($data['piece_id'] ?? 0);
+        $quantite = (int) ($data['quantite'] ?? 0);
+
+        if ($commandeId <= 0 || $pieceId <= 0) {
+            $this->view->error(400, 'Commande ou pièce invalide');
+            return;
+        }
+
+        if ($quantite < 1 || $quantite > self::QUANTITE_MAX) {
+            $this->view->error(400, 'La quantité doit être comprise entre 1 et ' . self::QUANTITE_MAX);
+            return;
+        }
+
+        try {
+            /** @var PDO $pdo */
+            $pdo = require __DIR__ . '/../config/db.php';
+            $ticketModel = new TicketModel($pdo);
+
+            // On vérifie la pièce avant d'écrire : un id inventé donnerait sinon une erreur 500 de la base
+            if (!(new PieceModel($pdo))->tousExistent([$pieceId])) {
+                $this->view->error(404, 'Pièce introuvable');
+                return;
+            }
+
+            // La commande doit appartenir à l'organisation de l'utilisateur connecté
+            if (!$ticketModel->commandeAppartientALOrganisation($commandeId, (int) $connecte['sub'])) {
+                $this->view->error(403, 'Ajout non autorisé');
+                return;
+            }
+
+            $this->view->ticketsCrees($ticketModel->creerPlusieurs($commandeId, $pieceId, $quantite));
+        } catch (Throwable $e) {
+            error_log($e->getMessage());
+            $this->view->error(500, 'Impossible d\'ajouter la pièce');
         }
     }
 }

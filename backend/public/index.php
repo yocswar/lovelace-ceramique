@@ -59,6 +59,9 @@ switch ($path) {
             case 'POST':
                 $controller->recreer();
                 break;
+            case 'DELETE':
+                $controller->supprimer();
+                break;
             default:
                 http_response_code(405);
                 echo json_encode([
@@ -79,6 +82,21 @@ switch ($path) {
             echo json_encode(['message' => 'Méthode non autorisée']);
         }
 
+        break;
+        
+    case '/api/tickets/ajout':
+        $controller = new TicketController();
+ 
+        if ($method === 'POST') {
+            $controller->creer();
+        } else {
+            http_response_code(405);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Méthode non autorisée'
+            ]);
+        }
+ 
         break;
 
     // Création de commande : le catalogue de pièces alimente la liste déroulante du formulaire

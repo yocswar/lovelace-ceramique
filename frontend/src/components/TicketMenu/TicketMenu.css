@@ -1,0 +1,40 @@
+.ticket-menu { position: relative; }
+
+.ticket-menu__trigger {
+  background: none;
+  border: none;
+  color: #9a4314;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.ticket-menu__trigger:hover,
+.ticket-menu__trigger[aria-expanded="true"] { background: #f1e4d8; }
+
+.ticket-menu__list {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 20;
+  min-width: 150px;
+  margin: 4px 0 0;
+  padding: 4px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #e3d6c6;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.ticket-menu__list button {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.ticket-menu__list button:hover { background: #f5f0eb; }
+.ticket-menu__list .is-danger { color: #b3261e; }

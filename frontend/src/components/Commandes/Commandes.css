@@ -62,3 +62,54 @@
     color: #e5d6c1;
     font-size: 14px;
 }
+  background: var(--couleur-principale);
+  color: white;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* modification du logo de repli et dépli*/
+.chevron-bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  padding: 4px 6px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.chevron-bouton:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* bouton « + » du header : à droite, à côté du titre de la commande */
+.ajout-piece-bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  min-width: 0;
+  height: 32px;
+  margin: 0 0 0 auto;
+  padding: 0;
+  background: none;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  color: inherit;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ajout-piece-bouton:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
