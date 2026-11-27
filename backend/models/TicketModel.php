@@ -64,7 +64,8 @@ final class TicketModel {
                     ) AS restants
             FROM commande_ticket ct
             JOIN etape e ON e.id = ct.etape_id
-            WHERE ct.commande_id = :commande_id"
+            WHERE ct.commande_id = :commande_id
+            AND ct.deleted_at IS NULL"
         );
 
         $stmt->execute(['commande_id' => $commandeId]);

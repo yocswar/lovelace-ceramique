@@ -67,11 +67,13 @@ final class CommandeModel
             AND EXISTS (
                 SELECT 1 FROM commande_ticket ct
                 WHERE ct.commande_id = c.id
+                AND ct.deleted_at IS NULL
             )
             AND NOT EXISTS (
                 SELECT 1 FROM commande_ticket ct
                 JOIN etape e ON e.id = ct.etape_id
                 WHERE ct.commande_id = c.id
+                AND ct.deleted_at IS NULL
                 AND e.nom NOT IN ('Terminé', 'Perte')
             )"
         );

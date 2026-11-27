@@ -35,12 +35,13 @@ final class TicketView
         ]);
     }
         // US.16 : confirme la suppression ; React retire la carte du Kanban
-    public function ticketSupprime(int $ticketId): void
+    public function ticketSupprime(int $ticketId, string $statutCommande): void
     {
         $this->send(200, [
             'status' => 'ok',
             'message' => 'Ticket supprimé',
             'ticket_id' => $ticketId,
+            'statut_commande' => $statutCommande,
         ]);
     }
     

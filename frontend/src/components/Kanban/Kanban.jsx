@@ -2,9 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import Toast from "../Toast/Toast";
 import "./Kanban.css";
 import TicketMenu from "../TicketMenu/TicketMenu";
+import Chevron from "../Chevron/Chevron";
 
 // Kanban d'une commande (US.14). On glisse une carte dans n'importe quelle colonne pour changer son étape (US.12).
-function Kanban({ commandeId, titre, actualiserStatut, statut }) {
+function Kanban({ commandeId, titre, actualiserStatut, statut, plie, togglePlie, ouvrirAjoutPiece }) {
   const [etapes, setEtapes] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -168,6 +169,7 @@ function Kanban({ commandeId, titre, actualiserStatut, statut }) {
 
       // La carte disparaît de la colonne sans recharger le Kanban
       setTickets((prev) => prev.filter((ticket) => ticket.id !== ticketASupprimer.id));
+      actualiserStatut(commandeId, data.statut_commande);
       showToast("success", data.message || "Ticket supprimé");
     } catch (error) {
       showToast("error", error.message);
@@ -256,6 +258,15 @@ function Kanban({ commandeId, titre, actualiserStatut, statut }) {
   return (
     <section className="kanban-section">
       <header className="commande-header">
+        <button
+          type="button"
+          className="chevron-bouton"
+          onClick={togglePlie}
+          aria-expanded={!plie}
+          aria-label={plie ? "Déplier la commande" : "Replier la commande"}
+        >
+          <Chevron plie={plie} />
+        </button>
         <h2>{titre}</h2>
 
         <div className="progression-commande">
@@ -275,6 +286,15 @@ function Kanban({ commandeId, titre, actualiserStatut, statut }) {
             Finaliser la commande
           </button>
         )}
+        <button
+          type="button"
+          className="ajout-piece-bouton"
+          onClick={ouvrirAjoutPiece}
+          aria-label={"Ajouter une pièce à la commande n°" + commandeId}
+          title="Ajouter une pièce"
+        >
+          +
+        </button>
       </header>
       {message && (
         <p role="status" className={`connection-message ${status}`}>
@@ -339,7 +359,7 @@ function Kanban({ commandeId, titre, actualiserStatut, statut }) {
         </div>
       )}
 
-      <div className="kanban">
+      <div className="kanban" style={{ display: plie ? "none" : "flex" }}>
         {etapes.map((etape) => {
           const cartes = tickets.filter((ticket) => ticket.etape_id === etape.id);
           // Toutes les colonnes acceptent la carte, sauf celle où elle est déjà
