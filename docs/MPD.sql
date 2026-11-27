@@ -10,6 +10,7 @@ CREATE TYPE "role" AS ENUM (
 CREATE TYPE "statut_commande" AS ENUM (
 	'a_faire',
 	'en_cours',
+	'a_finaliser',
 	'terminee',
 	'livree'
 );
@@ -46,6 +47,7 @@ CREATE TABLE IF NOT EXISTS "commande_ticket" (
 	"piece_id" INTEGER NOT NULL,
 	"commande_id" INTEGER NOT NULL,
 	"etape_id" INTEGER NOT NULL,
+	"deleted_at" TIMESTAMP WITH TIME ZONE NULL,
 	PRIMARY KEY("id")
 );
 
