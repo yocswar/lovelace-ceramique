@@ -1,0 +1,12 @@
+.chevron {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.chevron--plie {
+  transform: rotate(0deg);
+}
+
+.chevron--deplie {
+  transform: rotate(90deg);
+}

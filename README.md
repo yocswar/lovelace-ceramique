@@ -89,7 +89,7 @@ PHP-FPM 8.5
 PostgreSQL 17
 ```
 
-Le frontend React fonctionne **hors Docker** pendant le développement. Docker exécute Nginx, PHP, PostgreSQL et pgAdmin. Le proxy de `frontend/vite.config.js` redirige les requêtes `/api` vers Nginx ; les composants peuvent donc appeler `fetch('/api/healthcheck')` sans URL absolue.
+Docker exécute Node, React, Nginx, PHP, PostgreSQL et pgAdmin. Le proxy de `frontend/vite.config.js` redirige les requêtes `/api` vers le conteneur Nginx ; les composants peuvent donc appeler `fetch('/api/healthcheck')` sans URL absolue.
 
 ## 5. Installation et démarrage
 
@@ -124,8 +124,6 @@ openssl version
 git clone https://github.com/yocswar/lovelace-ceramique.git lovelace-ceramique
 cd lovelace-ceramique
 ```
-
-> Tant que la pull request d'architecture n'est pas fusionnée, les instructions React/PHP ci-dessous correspondent à la branche `chore/project-architecture`, et pas nécessairement à `main`.
 
 ### Étape 2 — Configurer l'environnement
 
@@ -274,7 +272,7 @@ Si l'inscription ou la connexion échoue, consulter le [dépannage](#dépannage-
 ### Arrêter et redémarrer
 
 - **Services Docker :** depuis la racine du dépôt, `docker compose down`.
-- **Redémarrage :** `docker compose up -d`, puis `npm run dev` depuis `frontend/`.
+- **Redémarrage :** `docker compose up --build -d`.
 
 Ne pas utiliser `docker compose down -v` pour un arrêt normal : l'option `-v` supprime les volumes Docker et peut entraîner une perte de données PostgreSQL (il faudra alors rejouer l'étape 6).
 
